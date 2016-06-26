@@ -26,10 +26,13 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>https://github.com/larspehrsson/minboks/tree/master/Publish/</InstallUrl>
+    <ProductName>EBoks autodownloader</ProductName>
+    <PublisherName>Lars Pehrsson</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -139,12 +142,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="publish\Application Files\MinEBoks_1_0_0_0\MinEBoks.application" />
-    <None Include="publish\Application Files\MinEBoks_1_0_0_0\MinEBoks.exe.config.deploy" />
-    <None Include="publish\Application Files\MinEBoks_1_0_0_0\MinEBoks.exe.deploy" />
-    <None Include="publish\Application Files\MinEBoks_1_0_0_0\MinEBoks.exe.manifest" />
-    <None Include="publish\Application Files\MinEBoks_1_0_0_0\RestSharp.dll.deploy" />
-    <None Include="publish\MinEBoks.application" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -160,10 +157,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="publish\publish.htm" />
-    <Content Include="publish\setup.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
