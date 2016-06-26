@@ -1,0 +1,66 @@
+﻿<Window x:Class="MinEBoks.Konfiguration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MinEBoks"
+        mc:Ignorable="d"
+        Title="Konfiguration" Height="586.127" Width="785.254">
+    <Grid>
+        <Grid Margin="10,10,10,0"  >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="365*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label x:Name="head3" Content="EBoks:"      HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Row="0" Height="30" FontSize="14" FontWeight="Bold"/>
+            <Label x:Name="head2" Content="Opsætning:"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="10" Height="30" FontSize="14" FontWeight="Bold" RenderTransformOrigin="0.57,11.083"/>
+            <Label x:Name="head1" Content="Mailserver:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Row="3" Height="30" FontSize="14" FontWeight="Bold"/>
+
+            <Label x:Name="labela" Content="Brugernavn" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="0" />
+            <Label x:Name="label1" Content="Password" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="1" />
+            <Label x:Name="label2" Content="Aktiveringskode" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="2" Grid.ColumnSpan="2"/>
+            <Label x:Name="labelx" Content="Gem-sti" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="10" Height="26" />
+            <Label x:Name="labely" Content="Download kun" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="11" Height="26" />
+
+            <Label x:Name="label4" Content="DNS" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="3" Height="26" />
+            <Label x:Name="label5" Content="Port" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" Height="26" />
+            <Label x:Name="label6" Content="SSL" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Height="26" />
+            <Label x:Name="label7" Content="Login" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="6" Height="26" />
+            <Label x:Name="label8" Content="Password" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="7" Height="26" />
+            <Label x:Name="label9" Content="Mail from" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="8" Height="26" />
+            <Label x:Name="label10" Content="Mail to" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="9" Height="26" />
+
+            <TextBox x:Name="BrugernavnTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="0"/>
+            <TextBox x:Name="PasswordTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="1"/>
+            <TextBox x:Name="AktiveringTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="2"/>
+            <TextBox x:Name="MailDNSTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="3"/>
+            <TextBox x:Name="MailPortTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="4"/>
+            <CheckBox x:Name="MailSSLCB" Grid.Column="2" HorizontalAlignment="Left" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="5"/>
+            <TextBox x:Name="MailUserTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="6"/>
+            <TextBox x:Name="MailPasswdTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="7"/>
+            <TextBox x:Name="MailFromTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="8"/>
+            <TextBox x:Name="MailToTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="9"/>
+            <TextBox x:Name="SavePathTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="10"/>
+            <CheckBox x:Name="downloadonlyCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="11"/>
+
+            <Button x:Name="SaveButton" Content="Gem" Grid.Column="2" Height="32" Margin="0,10,10,0" Grid.Row="12" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="SaveButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
