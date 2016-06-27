@@ -249,3 +249,6 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 publish/publish.htm
+/download.jpg
+/eboks.png
+/eboksdownloader.png

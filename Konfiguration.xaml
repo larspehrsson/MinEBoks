@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinEBoks"
         mc:Ignorable="d"
-        Title="Konfiguration" Height="586.127" Width="785.254">
+        Title="Konfiguration" Height="586" Width="785" Icon="eboksdownloader.ico">
     <Grid>
         <Grid Margin="10,10,10,0"  >
             <Grid.RowDefinitions>

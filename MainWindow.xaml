@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinEBoks"
         mc:Ignorable="d"
-        Title="EBoks downloader" Height="350" Width="525">
+        Title="EBoks downloader" Height="350" Width="525" Icon="eboksdownloader.ico">
     <Grid>
         <DockPanel>
             <Menu DockPanel.Dock="Top">
