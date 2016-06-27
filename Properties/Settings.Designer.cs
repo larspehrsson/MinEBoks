@@ -214,5 +214,16 @@ namespace MinEBoks.Properties {
                 this["downloadonly"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection idhentet {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["idhentet"]));
+            }
+            set {
+                this["idhentet"] = value;
+            }
+        }
     }
 }

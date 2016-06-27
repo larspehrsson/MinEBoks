@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -36,12 +33,10 @@ namespace MinEBoks
         private const string BaseUrl = "https://rest.e-boks.dk/mobile/1/xml.svc/en-gb";
 
         private static readonly Session _session = new Session();
-        private List<string> _hentet = new List<string>();
+        //private List<string> _hentet = new List<string>();
 
         public void DownloadFromEBoks(IProgress<string> progress)
         {
-            LoadHentetList();
-
             progress.Report("Kontrollerer for nye meddelelser");
             GetSessionForAccountRest();
             DownloadAll(progress);
@@ -54,50 +49,6 @@ namespace MinEBoks
             }
         }
 
-        private void LoadHentetList()
-        {
-            try
-            {
-                using (
-                    var sr =
-                        new StreamReader(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
-                                         "\\hentet.txt"))
-                {
-                    while (sr.Peek() >= 0)
-                    {
-                        _hentet.Add(sr.ReadLine());
-                    }
-                }
-            }
-            catch
-            {
-                _hentet = new List<string>();
-            }
-
-            _hentet = new List<string>();
-
-        }
-
-        private void SaveHentetList(string id)
-        {
-            try
-            {
-                using (
-                    var sw =
-                        File.AppendText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt")
-                    )
-                    sw.WriteLine(id);
-            }
-            catch (Exception)
-            {
-                Thread.Sleep(1000);
-                using (
-                    var sw =
-                        File.AppendText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt")
-                    )
-                    sw.WriteLine(id);
-            }
-        }
 
         public bool GetSessionForAccountRest()
         {
@@ -134,7 +85,8 @@ namespace MinEBoks
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                MessageBox.Show("Fejl ved kald af EBoks : " + response.Content, "Fejl", MessageBoxButton.OK,MessageBoxImage.Error);
+                MessageBox.Show("Fejl ved kald af EBoks : " + response.Content, "Fejl", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 return false;
             }
 
@@ -185,8 +137,7 @@ namespace MinEBoks
                     var messageId = message.Attribute("id").Value;
 
                     // Kontroller hvis allerede hentet
-                    if (_hentet.Contains(messageId))
-                        continue;
+                    if (Settings.Default.idhentet.Contains(messageId)) continue;
 
                     var messageName = message.Attribute("name").Value;
                     var format = message.Attribute("format").Value;
@@ -204,17 +155,19 @@ namespace MinEBoks
 
                         // Hent vedhæftninger til besked
                         GetSessionForAccountRest();
-                        mailContent(_session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
-                                    "/content", afsender.Trim() + " - " + messageName.Trim(), format, afsender, subject,
+                        mailContent(
+                            _session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
+                            "/content", afsender.Trim() + " - " + messageName.Trim(), format, afsender, subject,
                             modtaget, progress);
                     }
-                    _hentet.Add(messageId);
-                    SaveHentetList(messageId);
+
+                    Settings.Default.idhentet.Add(messageId);
+                    Settings.Default.Save();
                 }
             }
         }
 
-        public XDocument getxml(string url)
+        private XDocument getxml(string url)
         {
             var client = new RestClient(BaseUrl)
             {
@@ -232,7 +185,7 @@ namespace MinEBoks
         }
 
 
-        public XDocument RemoveAllNameSpaces(string content)
+        private XDocument RemoveAllNameSpaces(string content)
         {
             // TODO: Remove this ugly replace
             var responsedoc = XDocument.Parse(content.Replace("xmlns=\"urn:eboks:mobile:1.0.0\"", ""));
@@ -242,7 +195,7 @@ namespace MinEBoks
             return responsedoc;
         }
 
-        public string getContent(string url, string filename, string extension, DateTime modtagetdato)
+        private string getContent(string url, string filename, string extension, DateTime modtagetdato)
         {
             extension = extension.ToLower();
 
@@ -282,7 +235,7 @@ namespace MinEBoks
             return filename;
         }
 
-        public bool mailContent(string url, string filename, string extension, string afsender, string subject,
+        private bool mailContent(string url, string filename, string extension, string afsender, string subject,
             DateTime modtagetdato, IProgress<string> progress)
         {
             filename = getContent(url, filename, extension, modtagetdato);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using MinEBoks.Properties;
 
 namespace MinEBoks
 {
@@ -27,6 +28,7 @@ namespace MinEBoks
 
         private async void HentMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
+
             var progress =
                 new Progress<string>(
                     s => listView.Items.Add(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "  " + s));

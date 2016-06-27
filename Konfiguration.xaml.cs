@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -89,7 +91,8 @@ namespace MinEBoks
                 Settings.Default.deviceid = Guid.NewGuid().ToString();
             if (string.IsNullOrEmpty(Settings.Default.response))
                 Settings.Default.response = GetRandomHexNumber(64);
-
+            if (Settings.Default.idhentet == null)
+                Settings.Default.idhentet = new StringCollection();
 
             if (!SendTestMail())
             {
