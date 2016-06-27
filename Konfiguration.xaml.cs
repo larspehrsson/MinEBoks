@@ -15,9 +15,9 @@ namespace MinEBoks
     /// <summary>
     ///     Interaction logic for Konfiguration.xaml
     /// </summary>
-    public partial class Konfiguration : Window
+    public partial class Konfiguration
     {
-        public bool konfigok = false;
+        public bool Konfigok;
 
         public Konfiguration()
         {
@@ -101,13 +101,13 @@ namespace MinEBoks
                 return;
             }
 
-            eboks EBoks = new eboks();
-            if (!EBoks.GetSessionForAccountRest())
+            Eboks eBoks = new Eboks();
+            if (!eBoks.GetSessionForAccountRest())
                 return;
 
             Settings.Default.Save();
 
-            konfigok = true;
+            Konfigok = true;
             Close();
         }
 
@@ -115,26 +115,26 @@ namespace MinEBoks
         private bool SendTestMail()
         {
 
-            if (Properties.Settings.Default.downloadonly)
+            if (Settings.Default.downloadonly)
                 return true;
 
             // Create a message and set up the recipients.
             var message = new MailMessage(
-                Properties.Settings.Default.mailfrom,
-                Properties.Settings.Default.mailto,
+                Settings.Default.mailfrom,
+                Settings.Default.mailto,
                 "Test af mail",
                 "")
             {
-                From = new MailAddress(Properties.Settings.Default.mailfrom, "Test af mail")
+                From = new MailAddress(Settings.Default.mailfrom, "Test af mail")
             };
 
             //Send the message.
-            var mailclient = new SmtpClient(Properties.Settings.Default.mailserver, Properties.Settings.Default.mailserverport)
+            var mailclient = new SmtpClient(Settings.Default.mailserver, Settings.Default.mailserverport)
             {
                 Credentials =
-                    new NetworkCredential(Properties.Settings.Default.mailserveruser,
-                        Properties.Settings.Default.mailserverpassword),
-                EnableSsl = Properties.Settings.Default.mailserverssl,
+                    new NetworkCredential(Settings.Default.mailserveruser,
+                        Settings.Default.mailserverpassword),
+                EnableSsl = Settings.Default.mailserverssl,
             };
 
             try
@@ -167,11 +167,13 @@ namespace MinEBoks
 
         private void SavePathTB_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
-            dlg.SelectedPath = SavePathTB.Text;
-            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
-            System.Windows.Forms.IWin32Window win = new OldWindow(source.Handle);
-            System.Windows.Forms.DialogResult result = dlg.ShowDialog(win);
+            var dlg = new System.Windows.Forms.FolderBrowserDialog
+            {
+                SelectedPath = SavePathTB.Text
+            };
+            var source = PresentationSource.FromVisual(this) as HwndSource;
+            var win = new OldWindow(source.Handle);
+            var result = dlg.ShowDialog(win);
 
             if (result==System.Windows.Forms.DialogResult.OK)
             SavePathTB.Text = dlg.SelectedPath;

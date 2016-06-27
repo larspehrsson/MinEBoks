@@ -8,9 +8,9 @@ namespace MinEBoks
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        readonly eboks _eboks = new eboks();
+        readonly Eboks _eboks = new Eboks();
 
         public MainWindow()
         {
@@ -20,8 +20,8 @@ namespace MinEBoks
             {
                 var konfig = new Konfiguration();
                 konfig.ShowDialog();
-                if (!konfig.konfigok)
-                    this.Close();
+                if (!konfig.Konfigok)
+                    Close();
 
             }
         }
@@ -40,8 +40,8 @@ namespace MinEBoks
             var konfig = new Konfiguration();
             konfig.ShowDialog();
 
-            if (!konfig.konfigok)
-                this.Close();
+            if (!konfig.Konfigok)
+                Close();
 
         }
     }

@@ -28,11 +28,11 @@ namespace MinEBoks
         public string Nonce { get; set; }
     }
 
-    public class eboks
+    public class Eboks
     {
         private const string BaseUrl = "https://rest.e-boks.dk/mobile/1/xml.svc/en-gb";
 
-        private static readonly Session _session = new Session();
+        private static readonly Session Session = new Session();
         //private List<string> _hentet = new List<string>();
 
         public void DownloadFromEBoks(IProgress<string> progress)
@@ -62,9 +62,9 @@ namespace MinEBoks
                 RequestFormat = DataFormat.Xml
             };
 
-            _session.DeviceId = Settings.Default.deviceid;
+            Session.DeviceId = Settings.Default.deviceid;
 
-            request.AddHeader("X-EBOKS-AUTHENTICATE", GetAuthHeader(_session));
+            request.AddHeader("X-EBOKS-AUTHENTICATE", GetAuthHeader(Session));
             request.AddHeader("Content-Type", "application/xml");
             request.AddHeader("Accept", "*/*");
 
@@ -90,32 +90,34 @@ namespace MinEBoks
                 return false;
             }
 
-            var sessionid =
-                response.Headers.Where(c => c.Name == "X-EBOKS-AUTHENTICATE")
-                    .Select(c => c.Value)
-                    .FirstOrDefault()
-                    .ToString()
-                    .Split(',');
+            var firstOrDefault = response.Headers.Where(c => c.Name == "X-EBOKS-AUTHENTICATE")
+                .Select(c => c.Value)
+                .FirstOrDefault();
 
-            _session.SessionId = sessionid[0].Substring(11, sessionid[0].Length - 12);
-            _session.Nonce = sessionid[1].Substring(8, sessionid[1].Length - 9);
+            if (firstOrDefault != null)
+            {
+                var sessionid =
+                    firstOrDefault
+                        .ToString()
+                        .Split(',');
+
+                Session.SessionId = sessionid[0].Substring(11, sessionid[0].Length - 12);
+                Session.Nonce = sessionid[1].Substring(8, sessionid[1].Length - 9);
+            }
 
             var doc = RemoveAllNameSpaces(response.Content);
 
-            _session.Name = doc.XPathSelectElement("Session/User").Attribute("name").Value;
-            _session.InternalUserId = doc.XPathSelectElement("Session/User").Attribute("userId").Value;
+            Session.Name = doc.XPathSelectElement("Session/User").Attribute("name").Value;
+            Session.InternalUserId = doc.XPathSelectElement("Session/User").Attribute("userId").Value;
 
-            if (string.IsNullOrEmpty(_session.Name))
-                return false;
-
-            return true;
+            return !string.IsNullOrEmpty(Session.Name);
         }
 
 
-        public void DownloadAll(IProgress<string> progress)
+        private void DownloadAll(IProgress<string> progress)
         {
             // Henter liste over foldere
-            var xdoc = getxml(_session.InternalUserId + "/0/mail/folders");
+            var xdoc = GetXML(Session.InternalUserId + "/0/mail/folders");
             var queryFolders =
                 (from t in xdoc.Descendants("FolderInfo") where t.Attribute("id") != null select t).ToList();
 
@@ -127,7 +129,7 @@ namespace MinEBoks
 
                 // Hent liste over beskeder i hver folder
                 GetSessionForAccountRest();
-                var messages = getxml(_session.InternalUserId + "/0/mail/folder/" + folderid + "?skip=0&take=100");
+                var messages = GetXML(Session.InternalUserId + "/0/mail/folder/" + folderid + "?skip=0&take=100");
 
                 // Traverser hver besked og hent vedhæftninger
                 var queryMessages =
@@ -155,8 +157,8 @@ namespace MinEBoks
 
                         // Hent vedhæftninger til besked
                         GetSessionForAccountRest();
-                        mailContent(
-                            _session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
+                        MailContent(
+                            Session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
                             "/content", afsender.Trim() + " - " + messageName.Trim(), format, afsender, subject,
                             modtaget, progress);
                     }
@@ -167,7 +169,7 @@ namespace MinEBoks
             }
         }
 
-        private XDocument getxml(string url)
+        private XDocument GetXML(string url)
         {
             var client = new RestClient(BaseUrl)
             {
@@ -195,7 +197,7 @@ namespace MinEBoks
             return responsedoc;
         }
 
-        private string getContent(string url, string filename, string extension, DateTime modtagetdato)
+        private string GetContent(string url, string filename, string extension, DateTime modtagetdato)
         {
             extension = extension.ToLower();
 
@@ -205,7 +207,7 @@ namespace MinEBoks
             if (File.Exists(filename + "." + extension))
             {
                 var i = 0;
-                var tmpfilename = "";
+                string tmpfilename;
                 do
                 {
                     i += 1;
@@ -235,15 +237,14 @@ namespace MinEBoks
             return filename;
         }
 
-        private bool mailContent(string url, string filename, string extension, string afsender, string subject,
-            DateTime modtagetdato, IProgress<string> progress)
+        private void MailContent(string url, string filename, string extension, string afsender, string subject, DateTime modtagetdato, IProgress<string> progress)
         {
-            filename = getContent(url, filename, extension, modtagetdato);
+            filename = GetContent(url, filename, extension, modtagetdato);
             if (filename == null)
-                return true;
+                return;
 
             if (Settings.Default.downloadonly)
-                return true;
+                return;
 
             // Create a message and set up the recipients.
             var message = new MailMessage(
@@ -280,8 +281,6 @@ namespace MinEBoks
             }
 
             data.Dispose();
-
-            return true;
         }
 
         private string GetAuthHeader(Session session)
@@ -300,7 +299,7 @@ namespace MinEBoks
         private string GetSessionHeader()
         {
             return
-                $"deviceid={_session.DeviceId},nonce={_session.Nonce},sessionid={_session.SessionId},response={Settings.Default.response}";
+                $"deviceid={Session.DeviceId},nonce={Session.Nonce},sessionid={Session.SessionId},response={Settings.Default.response}";
         }
 
         private string Sha256Hash(string value)
