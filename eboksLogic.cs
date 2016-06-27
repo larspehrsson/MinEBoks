@@ -20,7 +20,7 @@ namespace MinEBoks
         private static Session _session = new Session();
         private List<string> Hentet = new List<string>();
 
-        public void LoadHentetList()
+        private void LoadHentetList()
         {
             try
             {
@@ -39,7 +39,7 @@ namespace MinEBoks
             }
         }
 
-        public void SaveHentetList(string id)
+        private void SaveHentetList(string id)
         {
             try
             {
@@ -139,12 +139,12 @@ namespace MinEBoks
 
                     if (Properties.Settings.Default.opbyghentet)
                     {
-                        logMessage(progress, "Markeres som hentet " + afsender + " vedr. " + subject);
+                        progress.Report("Markeres som hentet " + afsender + " vedr. " + subject);
 
                     }
                     else
                     {
-                        logMessage(progress, "Henter meddelelse fra " + afsender + " vedr. " + subject);
+                        progress.Report("Henter meddelelse fra " + afsender + " vedr. " + subject);
 
                         // Hent vedhæftninger til besked
                         GetSessionForAccountRest(account);
@@ -253,7 +253,7 @@ namespace MinEBoks
             }
             catch (Exception ex)
             {
-                logMessage(progress, $"Exception caught in CreateMessageWithAttachment(): {ex}");
+                progress.Report($"Exception caught in CreateMessageWithAttachment(): {ex}");
             }
 
             data.Dispose();
@@ -276,8 +276,7 @@ namespace MinEBoks
 
         private string GetSessionHeader(Account account)
         {
-            string input = $"deviceid={_session.DeviceId},nonce={_session.Nonce},sessionid={_session.SessionId},response={account.response}";
-            return input;
+            return $"deviceid={_session.DeviceId},nonce={_session.Nonce},sessionid={_session.SessionId},response={account.response}";
         }
 
         private string Sha256Hash(string value)

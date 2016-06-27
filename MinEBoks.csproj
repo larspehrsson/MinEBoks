@@ -32,7 +32,7 @@
     <SuiteName>EBoks</SuiteName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationRevision>18</ApplicationRevision>
     <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -109,7 +109,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="eboksServer.cs" />
-    <Compile Include="Globals.cs" />
     <Compile Include="Konfiguration.xaml.cs">
       <DependentUpon>Konfiguration.xaml</DependentUpon>
     </Compile>

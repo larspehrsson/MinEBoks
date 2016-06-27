@@ -1,15 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace MinEBoks
 {
+
+    internal class Session
+    {
+        public string Name { get; set; }
+
+        public string InternalUserId { get; set; }
+
+        public string DeviceId { get; set; }
+
+        public string SessionId { get; set; }
+
+        public string Nonce { get; set; }
+    }
+
     public class Account
     {
         public string UserId { get; set; }
@@ -25,33 +34,6 @@ namespace MinEBoks
     {
         private static readonly Random Random = new Random();
 
-        private static readonly object _lkAppLog = new object();
-
-        // writes a message to the log file
-        private void logMessage(IProgress<string> progress, string format, params object[] args)
-        {
-            lock (_lkAppLog)
-            {
-                try
-                {
-                    var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-                    //Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + " " + string.Format(format, args));
-                    var logFile = exePath + "\\eboksreceiver-" + DateTime.UtcNow.ToString("MM") + ".log";
-                    using (var fp = new StreamWriter(logFile, true))
-                    {
-                        fp.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + " " + string.Format(format, args));
-                        fp.Flush();
-                    }
-
-                    progress.Report(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + " " + string.Format(format, args));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("logMessage::Exception: " + ex.Message);
-                }
-            }
-        }
 
         private static string GetRandomHexNumber(int digits)
         {
@@ -96,10 +78,10 @@ namespace MinEBoks
 
             LoadHentetList();
 
-            logMessage(progress, "Kontrollerer for nye meddelelser");
+            progress.Report("Kontrollerer for nye meddelelser");
             GetSessionForAccountRest(account);
             DownloadAll(account, progress);
-            logMessage(progress, "Kontrol slut");
+            progress.Report("Kontrol slut");
 
             if (Properties.Settings.Default.opbyghentet)
             {
