@@ -16,7 +16,7 @@ namespace MinEBoks
         {
             InitializeComponent();
 
-            if (Properties.Settings.Default.response == "")
+            if (Settings.Default.response == "" || Settings.Default.brugernavn == "")
             {
                 var konfig = new Konfiguration();
                 konfig.ShowDialog();

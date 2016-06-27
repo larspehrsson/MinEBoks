@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -36,6 +35,9 @@ namespace MinEBoks
             BrugernavnTB.Text = Settings.Default.brugernavn;
             MailSSLCB.IsChecked = Settings.Default.mailserverssl;
             downloadonlyCB.IsChecked = Settings.Default.downloadonly;
+
+            if (string.IsNullOrEmpty(Settings.Default.deviceid))
+                downloadonlyCB.IsChecked = true;
         }
         
         private void downloadonlyCB_toggled(object sender, RoutedEventArgs e)
