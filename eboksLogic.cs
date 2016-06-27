@@ -8,53 +8,98 @@ using System.Net.Mime;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Windows;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using MinEBoks.Properties;
 using RestSharp;
+using DataFormat = RestSharp.DataFormat;
 
 namespace MinEBoks
 {
-    public partial class MainWindow
+    internal class Session
+    {
+        public string Name { get; set; }
+
+        public string InternalUserId { get; set; }
+
+        public string DeviceId { get; set; }
+
+        public string SessionId { get; set; }
+
+        public string Nonce { get; set; }
+    }
+
+    public class eboks
     {
         private const string BaseUrl = "https://rest.e-boks.dk/mobile/1/xml.svc/en-gb";
-        private static Session _session = new Session();
-        private List<string> Hentet = new List<string>();
+
+        private static readonly Session _session = new Session();
+        private List<string> _hentet = new List<string>();
+
+        public void DownloadFromEBoks(IProgress<string> progress)
+        {
+            LoadHentetList();
+
+            progress.Report("Kontrollerer for nye meddelelser");
+            GetSessionForAccountRest();
+            DownloadAll(progress);
+            progress.Report("Kontrol slut");
+
+            if (Settings.Default.opbyghentet)
+            {
+                Settings.Default.opbyghentet = false;
+                Settings.Default.Save();
+            }
+        }
 
         private void LoadHentetList()
         {
             try
             {
-                using (StreamReader sr = new StreamReader(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt"))
+                using (
+                    var sr =
+                        new StreamReader(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
+                                         "\\hentet.txt"))
                 {
                     while (sr.Peek() >= 0)
                     {
-                        Hentet.Add(sr.ReadLine());
+                        _hentet.Add(sr.ReadLine());
                     }
                 }
-
             }
             catch
             {
-                Hentet = new List<string>();
+                _hentet = new List<string>();
             }
+
+            _hentet = new List<string>();
+
         }
 
         private void SaveHentetList(string id)
         {
             try
             {
-                using (StreamWriter sw = File.AppendText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt"))
+                using (
+                    var sw =
+                        File.AppendText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt")
+                    )
                     sw.WriteLine(id);
             }
             catch (Exception)
             {
-                System.Threading.Thread.Sleep(1000);
-                using (StreamWriter sw = File.AppendText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt"))
+                Thread.Sleep(1000);
+                using (
+                    var sw =
+                        File.AppendText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\hentet.txt")
+                    )
                     sw.WriteLine(id);
             }
         }
 
-        public void GetSessionForAccountRest(Account account)
+        public bool GetSessionForAccountRest()
         {
             var client = new RestClient(BaseUrl)
             {
@@ -66,26 +111,32 @@ namespace MinEBoks
                 RequestFormat = DataFormat.Xml
             };
 
-            _session.DeviceId = account.DeviceId;
+            _session.DeviceId = Settings.Default.deviceid;
 
-            request.AddHeader("X-EBOKS-AUTHENTICATE", GetAuthHeader(account, _session));
+            request.AddHeader("X-EBOKS-AUTHENTICATE", GetAuthHeader(_session));
             request.AddHeader("Content-Type", "application/xml");
             request.AddHeader("Accept", "*/*");
 
             var xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                       "<Logon xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:eboks:mobile:1.0.0\">" +
-                          "<App version=\"1.4.1\" os=\"iOS\" osVersion=\"9.0.0\" Device=\"iPhone\" />" +
-                          "<User " +
-                              "identity=\"" + account.UserId + "\" " +
-                              "identityType=\"P\" " +
-                              "nationality=\"DK\" " +
-                              "pincode=\"" + account.Password + "\"" +
-                          "/>" +
+                      "<App version=\"1.4.1\" os=\"iOS\" osVersion=\"9.0.0\" Device=\"iPhone\" />" +
+                      "<User " +
+                      "identity=\"" + Settings.Default.brugernavn + "\" " +
+                      "identityType=\"P\" " +
+                      "nationality=\"DK\" " +
+                      "pincode=\"" + Settings.Default.password + "\"" +
+                      "/>" +
                       "</Logon>";
 
             request.AddParameter("application/xml", xml, ParameterType.RequestBody);
 
             var response = client.Execute(request);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                MessageBox.Show("Fejl ved kald af EBoks : " + response.Content, "Fejl", MessageBoxButton.OK,MessageBoxImage.Error);
+                return false;
+            }
 
             var sessionid =
                 response.Headers.Where(c => c.Name == "X-EBOKS-AUTHENTICATE")
@@ -101,15 +152,20 @@ namespace MinEBoks
 
             _session.Name = doc.XPathSelectElement("Session/User").Attribute("name").Value;
             _session.InternalUserId = doc.XPathSelectElement("Session/User").Attribute("userId").Value;
+
+            if (string.IsNullOrEmpty(_session.Name))
+                return false;
+
+            return true;
         }
 
-        
-        public void DownloadAll(Account account, IProgress<string> progress)
-        {
 
+        public void DownloadAll(IProgress<string> progress)
+        {
             // Henter liste over foldere
-            var xdoc = getxml(account, _session.InternalUserId + "/0/mail/folders");
-            var queryFolders = (from t in xdoc.Descendants("FolderInfo") where t.Attribute("id") != null select t).ToList();
+            var xdoc = getxml(_session.InternalUserId + "/0/mail/folders");
+            var queryFolders =
+                (from t in xdoc.Descendants("FolderInfo") where t.Attribute("id") != null select t).ToList();
 
             // Traverser alle folderne
             foreach (var folder in queryFolders)
@@ -118,17 +174,18 @@ namespace MinEBoks
                 //var foldername = folder.Attribute("name").Value;
 
                 // Hent liste over beskeder i hver folder
-                GetSessionForAccountRest(account);
-                var messages = getxml(account, _session.InternalUserId + "/0/mail/folder/" + folderid + "?skip=0&take=100");
+                GetSessionForAccountRest();
+                var messages = getxml(_session.InternalUserId + "/0/mail/folder/" + folderid + "?skip=0&take=100");
 
                 // Traverser hver besked og hent vedhæftninger
-                var queryMessages = (from t in messages.Descendants("MessageInfo") where t.Attribute("id") != null select t).ToList();
+                var queryMessages =
+                    (from t in messages.Descendants("MessageInfo") where t.Attribute("id") != null select t).ToList();
                 foreach (var message in queryMessages)
                 {
                     var messageId = message.Attribute("id").Value;
 
                     // Kontroller hvis allerede hentet
-                    if (Hentet.Contains(messageId))
+                    if (_hentet.Contains(messageId))
                         continue;
 
                     var messageName = message.Attribute("name").Value;
@@ -137,29 +194,27 @@ namespace MinEBoks
                     var subject = message.Attribute("name").Value;
                     var modtaget = DateTime.Parse(message.Attribute("receivedDateTime").Value);
 
-                    if (Properties.Settings.Default.opbyghentet)
+                    if (Settings.Default.opbyghentet)
                     {
                         progress.Report("Markeres som hentet " + afsender + " vedr. " + subject);
-
                     }
                     else
                     {
                         progress.Report("Henter meddelelse fra " + afsender + " vedr. " + subject);
 
                         // Hent vedhæftninger til besked
-                        GetSessionForAccountRest(account);
-                        mailContent(account,
-                            _session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
-                            "/content", messageName + " - " + messageId + "." + format, afsender, subject, modtaget, progress);
+                        GetSessionForAccountRest();
+                        mailContent(_session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
+                                    "/content", afsender.Trim() + " - " + messageName.Trim(), format, afsender, subject,
+                            modtaget, progress);
                     }
-                    Hentet.Add(messageId);
+                    _hentet.Add(messageId);
                     SaveHentetList(messageId);
                 }
             }
-
         }
 
-        public XDocument getxml(Account account, string url)
+        public XDocument getxml(string url)
         {
             var client = new RestClient(BaseUrl)
             {
@@ -167,7 +222,7 @@ namespace MinEBoks
             };
 
             var request = new RestRequest(url, Method.GET);
-            request.AddHeader("X-EBOKS-AUTHENTICATE", GetSessionHeader(account));
+            request.AddHeader("X-EBOKS-AUTHENTICATE", GetSessionHeader());
             request.AddHeader("Accept", "*/*");
 
             var response = client.Execute(request);
@@ -187,13 +242,26 @@ namespace MinEBoks
             return responsedoc;
         }
 
-        public string getContent(Account account, string url, string filename, DateTime modtagetdato)
+        public string getContent(string url, string filename, string extension, DateTime modtagetdato)
         {
-            filename = Path.GetInvalidFileNameChars().Aggregate(filename, (current, c) => current.Replace(c, '_'));
-            filename = Properties.Settings.Default.savepath + filename;
+            extension = extension.ToLower();
 
-            if (File.Exists(filename))
-                return null;
+            filename = Path.GetInvalidFileNameChars().Aggregate(filename, (current, c) => current.Replace(c, '_'));
+            filename = Settings.Default.savepath + filename;
+
+            if (File.Exists(filename + "." + extension))
+            {
+                var i = 0;
+                var tmpfilename = "";
+                do
+                {
+                    i += 1;
+                    tmpfilename = filename + "(" + i + ")." + extension;
+                } while (File.Exists(tmpfilename));
+                filename = tmpfilename;
+            }
+            else
+                filename += "." + extension;
 
             var client = new RestClient(BaseUrl)
             {
@@ -201,7 +269,7 @@ namespace MinEBoks
             };
 
             var request = new RestRequest(url, Method.GET);
-            request.AddHeader("X-EBOKS-AUTHENTICATE", GetSessionHeader(account));
+            request.AddHeader("X-EBOKS-AUTHENTICATE", GetSessionHeader());
             request.AddHeader("Accept", "*/*");
 
             var filedata = client.DownloadData(request);
@@ -214,37 +282,39 @@ namespace MinEBoks
             return filename;
         }
 
-        public bool mailContent(Account account, string url, string filename, string afsender, string subject, DateTime modtagetdato, IProgress<string> progress)
+        public bool mailContent(string url, string filename, string extension, string afsender, string subject,
+            DateTime modtagetdato, IProgress<string> progress)
         {
-            filename = getContent(account, url, filename, modtagetdato);
+            filename = getContent(url, filename, extension, modtagetdato);
             if (filename == null)
                 return true;
 
-            if (Properties.Settings.Default.downloadonly)
+            if (Settings.Default.downloadonly)
                 return true;
 
             // Create a message and set up the recipients.
             var message = new MailMessage(
-                Properties.Settings.Default.mailfrom,
-                Properties.Settings.Default.mailto,
+                Settings.Default.mailfrom,
+                Settings.Default.mailto,
                 subject,
                 "")
             {
-                From = new MailAddress(Properties.Settings.Default.mailfrom, afsender)
+                From = new MailAddress(Settings.Default.mailfrom, afsender)
             };
 
 
             // Create  the file attachment for this e-mail message.
             var data = new Attachment(filename, MediaTypeNames.Application.Octet);
-            var disposition = data.ContentDisposition;
+            //var disposition = data.ContentDisposition;
             // Add the file attachment to this e-mail message.
             message.Attachments.Add(data);
 
             //Send the message.
-            var mailclient = new SmtpClient(Properties.Settings.Default.mailserver, Properties.Settings.Default.mailserverport)
+            var mailclient = new SmtpClient(Settings.Default.mailserver, Settings.Default.mailserverport)
             {
-                Credentials = new NetworkCredential(Properties.Settings.Default.mailserveruser, Properties.Settings.Default.mailserverpassword),
-                EnableSsl = Properties.Settings.Default.mailserverssl,
+                Credentials =
+                    new NetworkCredential(Settings.Default.mailserveruser, Settings.Default.mailserverpassword),
+                EnableSsl = Settings.Default.mailserverssl
             };
 
             try
@@ -261,12 +331,12 @@ namespace MinEBoks
             return true;
         }
 
-        private string GetAuthHeader(Account account, Session session)
+        private string GetAuthHeader(Session session)
         {
             var date = DateTime.Now.ToString("yyyy-mm-dd HH:mm:ss");
 
             string input =
-                $"{account.ActivationCode}:{session.DeviceId}:P:{account.UserId}:DK:{account.Password}:{date}";
+                $"{Settings.Default.aktiveringskode}:{session.DeviceId}:P:{Settings.Default.brugernavn}:DK:{Settings.Default.password}:{date}";
 
             var challenge = Sha256Hash(input);
             challenge = Sha256Hash(challenge);
@@ -274,9 +344,10 @@ namespace MinEBoks
             return $"logon deviceid=\"{session.DeviceId}\",datetime=\"{date}\",challenge=\"{challenge}\"";
         }
 
-        private string GetSessionHeader(Account account)
+        private string GetSessionHeader()
         {
-            return $"deviceid={_session.DeviceId},nonce={_session.Nonce},sessionid={_session.SessionId},response={account.response}";
+            return
+                $"deviceid={_session.DeviceId},nonce={_session.Nonce},sessionid={_session.SessionId},response={Settings.Default.response}";
         }
 
         private string Sha256Hash(string value)
