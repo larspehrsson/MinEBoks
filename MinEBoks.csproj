@@ -26,12 +26,13 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>https://raw.githubusercontent.com/larspehrsson/MinEBoks/master/publish/</InstallUrl>
+    <SupportUrl>https://github.com/larspehrsson/mineboks</SupportUrl>
     <ProductName>EBoks autodownloader</ProductName>
     <PublisherName>Lars Pehrsson</PublisherName>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <SuiteName>EBoks</SuiteName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>11</ApplicationRevision>
+    <ApplicationRevision>12</ApplicationRevision>
     <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
