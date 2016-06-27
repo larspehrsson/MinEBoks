@@ -43,5 +43,17 @@ namespace MinEBoks
             Settings.Default.Save();
             Close();
         }
+
+        private void downloadonlyCB_toggled(object sender, RoutedEventArgs e)
+        {
+            MailDNSTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            MailPortTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            MailUserTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            MailPasswdTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            MailFromTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            MailToTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            MailSSLCB.IsEnabled = !downloadonlyCB.IsChecked.Value;
+
+        }
     }
 }

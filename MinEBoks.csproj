@@ -15,7 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>C:\Dropbox\Visual Studio\gith\MinEBoks\publish\</PublishUrl>
+    <PublishUrl>C:\Dropbox\Public\publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -25,14 +25,14 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://raw.githubusercontent.com/larspehrsson/MinEBoks/master/publish/</InstallUrl>
+    <InstallUrl>https://dl.dropboxusercontent.com/u/10635853/publish/</InstallUrl>
     <SupportUrl>https://github.com/larspehrsson/mineboks</SupportUrl>
     <ProductName>EBoks autodownloader</ProductName>
     <PublisherName>Lars Pehrsson</PublisherName>
     <SuiteName>EBoks</SuiteName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>13</ApplicationRevision>
+    <ApplicationRevision>15</ApplicationRevision>
     <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
