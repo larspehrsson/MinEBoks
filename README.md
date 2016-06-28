@@ -3,6 +3,8 @@ Program til automatisk at hente dokumenter fra eBoks og gemme dem i en mappe og 
 
 Programmet skal konfigureres ved første start.
 
+Windows installationsprogram til denne version [setup.exe](https://dl.dropboxusercontent.com/u/10635853/EBoks/setup.exe)
+
 ## Related projects
 
 - [MinBoks](https://github.com/larspehrsson/MinBoks) by [Lars Pehrsson] windows service version af denne.
