@@ -36,7 +36,7 @@ namespace MinEBoks
             MailSSLCB.IsChecked = Settings.Default.mailserverssl;
             downloadonlyCB.IsChecked = Settings.Default.downloadonly;
 
-            if (string.IsNullOrEmpty(Settings.Default.deviceid))
+            if (string.IsNullOrEmpty(Settings.Default.deviceid) || string.IsNullOrEmpty(Settings.Default.brugernavn))
                 downloadonlyCB.IsChecked = true;
         }
         

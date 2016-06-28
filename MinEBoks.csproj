@@ -32,7 +32,7 @@
     <SuiteName>EBoks</SuiteName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>30</ApplicationRevision>
+    <ApplicationRevision>31</ApplicationRevision>
     <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -137,6 +137,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
