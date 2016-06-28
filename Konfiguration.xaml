@@ -31,7 +31,7 @@
 
             <Label x:Name="head3" Content="EBoks:"      HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Row="0" Height="30" FontSize="14" FontWeight="Bold"/>
             <Label x:Name="head2" Content="Opsætning:"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="10" Height="30" FontSize="14" FontWeight="Bold" RenderTransformOrigin="0.57,11.083"/>
-            <Label x:Name="head1" Content="Mailserver:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Row="3" Height="30" FontSize="14" FontWeight="Bold"/>
+            <Label x:Name="maillabel" Content="Mailserver:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Row="3" Height="30" FontSize="14" FontWeight="Bold"/>
 
             <Label x:Name="labela" Content="Brugernavn" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="0" />
             <Label x:Name="label1" Content="Password" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="1" />
@@ -39,13 +39,13 @@
             <Label x:Name="labelx" Content="Gem-sti" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="10" Height="26" />
             <Label x:Name="labely" Content="Download kun" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="11" Height="26" />
 
-            <Label x:Name="label4" Content="DNS" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="3" Height="26" />
-            <Label x:Name="label5" Content="Port" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" Height="26" />
-            <Label x:Name="label6" Content="SSL" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Height="26" />
-            <Label x:Name="label7" Content="Login" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="6" Height="26" />
-            <Label x:Name="label8" Content="Password" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="7" Height="26" />
-            <Label x:Name="label9" Content="Mail from" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="8" Height="26" />
-            <Label x:Name="label10" Content="Mail to" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="9" Height="26" />
+            <Label x:Name="dnslabel" Content="DNS" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="3" Height="26" />
+            <Label x:Name="portlabel" Content="Port" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" Height="26" />
+            <Label x:Name="ssllabel" Content="SSL" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Height="26" />
+            <Label x:Name="loginlabel" Content="Login" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="6" Height="26" />
+            <Label x:Name="passwordlabel" Content="Password" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="7" Height="26" />
+            <Label x:Name="fromlabel" Content="Mail from" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="8" Height="26" />
+            <Label x:Name="mailtolabel" Content="Mail to" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="9" Height="26" />
 
             <TextBox x:Name="BrugernavnTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="0" ToolTip="Cprnummer uden -" />
             <TextBox x:Name="PasswordTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="1" ToolTip="Password til EBoks" />

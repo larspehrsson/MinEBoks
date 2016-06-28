@@ -50,6 +50,16 @@ namespace MinEBoks
             MailToTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
             MailSSLCB.IsEnabled = !downloadonlyCB.IsChecked.Value;
 
+            maillabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+
+            dnslabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            portlabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            ssllabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            loginlabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            passwordlabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            fromlabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+            mailtolabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
+
         }
 
 
