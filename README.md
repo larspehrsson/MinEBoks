@@ -1,4 +1,4 @@
-# MinBoks
+# MinEBoks
 Program til automatisk at hente dokumenter fra eBoks og gemme dem i en mappe og evt. også videresende dem til en valgfri mail adresse.
 
 Programmet skal konfigureres ved første start.
