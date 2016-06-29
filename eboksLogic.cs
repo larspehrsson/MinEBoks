@@ -6,13 +6,16 @@ using System.Net.Mail;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Web.Security;
 using System.Windows;
+using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using MinEBoks.Properties;
 using RestSharp;
 using DataFormat = RestSharp.DataFormat;
+using MessageBox = System.Windows.MessageBox;
 
 namespace MinEBoks
 {
@@ -35,20 +38,31 @@ namespace MinEBoks
 
         private static readonly Session Session = new Session();
 
-        private static readonly string purpose = "NwA3ADUAMQ!AxASDkAMbwAzADcA0";
-        //private List<string> _hentet = new List<string>();
+        private static readonly string keyphrase = "NwA3ADUAMQ!AxASDkAMbwAzADcA0";
 
-        public void DownloadFromEBoks(IProgress<string> progress)
+        private readonly object runningLock = new object();
+
+        public void DownloadFromEBoks(IProgress<string> progress, NotifyIcon _notification)
         {
-            progress.Report("Kontrollerer for nye meddelelser");
-            GetSessionForAccountRest();
-            DownloadAll(progress);
-            progress.Report("Kontrol slut");
-
-            if (Settings.Default.opbyghentet)
+            if (Monitor.TryEnter(runningLock))
             {
-                Settings.Default.opbyghentet = false;
-                Settings.Default.Save();
+                try
+                {
+                    progress.Report("Kontrollerer for nye meddelelser");
+                    GetSessionForAccountRest();
+                    DownloadAll(progress, _notification);
+                    progress.Report("Kontrol slut");
+
+                    if (Settings.Default.opbyghentet)
+                    {
+                        Settings.Default.opbyghentet = false;
+                        Settings.Default.Save();
+                    }
+                }
+                finally
+                {
+                    Monitor.Exit(runningLock);
+                }
             }
         }
 
@@ -117,8 +131,9 @@ namespace MinEBoks
         }
 
 
-        private void DownloadAll(IProgress<string> progress)
+        private void DownloadAll(IProgress<string> progress, NotifyIcon _notification)
         {
+
             // Henter liste over foldere
             var xdoc = GetXML(Session.InternalUserId + "/0/mail/folders");
             var queryFolders =
@@ -157,6 +172,9 @@ namespace MinEBoks
                     else
                     {
                         progress.Report("Henter meddelelse fra " + afsender + " vedr. " + subject);
+
+                        _notification.BalloonTipText = "Hentede " + subject + " fra eboks";
+                        _notification.ShowBalloonTip(5);
 
                         // Hent vedhæftninger til besked
                         GetSessionForAccountRest();
@@ -271,7 +289,8 @@ namespace MinEBoks
             var mailclient = new SmtpClient(Settings.Default.mailserver, Settings.Default.mailserverport)
             {
                 Credentials =
-                    new NetworkCredential(Settings.Default.mailserveruser, Unprotect(Settings.Default.mailserverpassword)),
+                    new NetworkCredential(Settings.Default.mailserveruser,
+                        Unprotect(Settings.Default.mailserverpassword)),
                 EnableSsl = Settings.Default.mailserverssl
             };
 
@@ -325,7 +344,7 @@ namespace MinEBoks
                 return null;
 
             var myUnprotectedBytes = Encoding.UTF8.GetBytes(text);
-            var encodedValue = MachineKey.Protect(myUnprotectedBytes, purpose);
+            var encodedValue = MachineKey.Protect(myUnprotectedBytes, keyphrase);
 
             return Convert.ToBase64String(encodedValue);
         }
@@ -338,7 +357,7 @@ namespace MinEBoks
             try
             {
                 var stream = Convert.FromBase64String(text);
-                var decodedValue = MachineKey.Unprotect(stream, purpose);
+                var decodedValue = MachineKey.Unprotect(stream, keyphrase);
                 return Encoding.UTF8.GetString(decodedValue);
             }
             catch (Exception)

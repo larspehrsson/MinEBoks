@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinEBoks"
         mc:Ignorable="d"
-        Title="Konfiguration" Height="586" Width="785" Icon="eboksdownloader.ico">
+        Title="Konfiguration" Height="577.383" Width="785" Icon="eboksdownloader.ico">
     <Grid>
         <Grid Margin="10,10,10,0"  >
             <Grid.RowDefinitions>
@@ -21,6 +21,7 @@
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="0"/>
                 <RowDefinition Height="80"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -60,7 +61,8 @@
             <TextBox x:Name="SavePathTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="10" MouseDoubleClick="SavePathTB_OnMouseDoubleClick" ToolTip="Hvor skal hentede dokumenter gemmes" />
             <CheckBox x:Name="downloadonlyCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="11" HorizontalAlignment="Left" Checked="downloadonlyCB_toggled" Unchecked="downloadonlyCB_toggled" ToolTip="Hvis dokumenter kun skal hentes og ikke sendes" />
 
-            <Button x:Name="SaveButton" Content="Gem" Grid.Column="2" Height="32" Margin="0,10,10,0" Grid.Row="12" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="SaveButton_Click"/>
+            <Button x:Name="NulstilHentedeButton" Content="Nulstil hentede" Grid.Column="2" Height="32" Margin="0,10,163,0" Grid.Row="13" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="NulstilHentedeButton_OnClick" />
+            <Button x:Name="SaveButton" Content="Gem" Grid.Column="2" Height="32" Margin="0,10,10,0" Grid.Row="13" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="SaveButton_Click"/>
         </Grid>
     </Grid>
 </Window>

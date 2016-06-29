@@ -7,6 +7,10 @@ Login til EBoks finder du ved at logge ind på eboks og gå til [Menu -> Mobilad
 
 Ønsker man at downloaded alle dokumenter til en mappe (fx sin dropbox) skal man udfylde Cpr-nr, Adgangskode og Aktiveringskode. Disse tre oplysninger finder man på ovenstående side. Hvis man også ønsker at få nye dokumenter tilsendt som post skal man fjerne krydset i "Download kun" og udfylde Mailserver opsætningen. 
 
+Programmet holder styr på hvilke dokumenter der er hentet, så man kan flytte dokumenterne efter at de er hentet uden at det bliver hentet igen. Listen over hentede dokumenter kan nulstilles i opsætningen.
+
+Så længe programmet kører vil det polle efter nye dokumenter hver 4. time.
+
 Windows installationsprogram til denne version [setup.exe](https://dl.dropboxusercontent.com/u/10635853/EBoks/setup.exe)
 
 ## Related projects

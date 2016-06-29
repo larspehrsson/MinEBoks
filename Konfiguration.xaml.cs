@@ -174,6 +174,17 @@ namespace MinEBoks
                 SavePathTB.Text = dlg.SelectedPath;
         }
 
+        private void NulstilHentedeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var svar = MessageBox.Show("Er du sikker på at du vil hente alle dokumenter igen?",
+                "Nulstil liste over hentede dokumenter", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation);
+
+            if (svar != MessageBoxResult.Yes) return;
+
+            Settings.Default.idhentet = new StringCollection();
+            Settings.Default.Save();
+        }
+
         private class OldWindow : IWin32Window
         {
             private readonly IntPtr _handle;
