@@ -5,9 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using MinEBoks.Properties;
+using IWin32Window = System.Windows.Forms.IWin32Window;
 using MessageBox = System.Windows.MessageBox;
 
 namespace MinEBoks
@@ -17,14 +19,17 @@ namespace MinEBoks
     /// </summary>
     public partial class Konfiguration
     {
+        private static readonly Random Random = new Random();
         public bool Konfigok;
 
         public Konfiguration()
         {
             InitializeComponent();
 
-            PasswordTB.Text = Settings.Default.password;
-            AktiveringTB.Text = Settings.Default.aktiveringskode;
+            PasswordTB.Password = Eboks.Unprotect(Settings.Default.password);
+            AktiveringTB.Password = Eboks.Unprotect(Settings.Default.aktiveringskode);
+            BrugernavnTB.Password = Eboks.Unprotect(Settings.Default.brugernavn);
+
             SavePathTB.Text = Settings.Default.savepath;
             MailDNSTB.Text = Settings.Default.mailserver;
             MailPortTB.Text = Settings.Default.mailserverport.ToString();
@@ -32,14 +37,13 @@ namespace MinEBoks
             MailPasswdTB.Text = Settings.Default.mailserverpassword;
             MailFromTB.Text = Settings.Default.mailfrom;
             MailToTB.Text = Settings.Default.mailto;
-            BrugernavnTB.Text = Settings.Default.brugernavn;
             MailSSLCB.IsChecked = Settings.Default.mailserverssl;
             downloadonlyCB.IsChecked = Settings.Default.downloadonly;
 
             if (string.IsNullOrEmpty(Settings.Default.deviceid) || string.IsNullOrEmpty(Settings.Default.brugernavn))
                 downloadonlyCB.IsChecked = true;
         }
-        
+
         private void downloadonlyCB_toggled(object sender, RoutedEventArgs e)
         {
             MailDNSTB.IsEnabled = !downloadonlyCB.IsChecked.Value;
@@ -59,25 +63,20 @@ namespace MinEBoks
             passwordlabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
             fromlabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
             mailtolabel.IsEnabled = !downloadonlyCB.IsChecked.Value;
-
         }
 
-
-        private static readonly Random Random = new Random();
-        
         private static string GetRandomHexNumber(int digits)
         {
-            var buffer = new byte[digits / 2];
+            var buffer = new byte[digits/2];
             Random.NextBytes(buffer);
             var result = string.Concat(buffer.Select(x => x.ToString("X2")).ToArray());
-            if (digits % 2 == 0)
+            if (digits%2 == 0)
                 return result.ToLower();
             return (result + Random.Next(16).ToString("x")).ToLower();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-
             if (!Directory.Exists(SavePathTB.Text))
             {
                 MessageBox.Show("Katalog findes ikke: " + SavePathTB.Text, "Fejl", MessageBoxButton.OK,
@@ -85,19 +84,20 @@ namespace MinEBoks
                 return;
             }
 
-            Settings.Default.password = PasswordTB.Text.Trim();
-            Settings.Default.aktiveringskode = AktiveringTB.Text.Trim();
-            Settings.Default.savepath = SavePathTB.Text+(SavePathTB.Text.EndsWith("\\")?"":"\\");
+            Settings.Default.brugernavn =
+                Eboks.Protect(string.Join("", BrugernavnTB.Password.Where(char.IsDigit)).PadLeft(10, '0'));
+            Settings.Default.password = Eboks.Protect(PasswordTB.Password.Trim());
+            Settings.Default.aktiveringskode = Eboks.Protect(AktiveringTB.Password.Trim());
+
+            Settings.Default.savepath = SavePathTB.Text + (SavePathTB.Text.EndsWith("\\") ? "" : "\\");
             Settings.Default.mailserver = MailDNSTB.Text;
             Settings.Default.mailserverport = int.Parse(MailPortTB.Text);
             Settings.Default.mailserveruser = MailUserTB.Text;
             Settings.Default.mailserverpassword = MailPasswdTB.Text;
             Settings.Default.mailfrom = MailFromTB.Text;
             Settings.Default.mailto = MailToTB.Text;
-            Settings.Default.brugernavn = String.Join("", BrugernavnTB.Text.Where(char.IsDigit)).PadLeft(10,'0');
             Settings.Default.mailserverssl = MailSSLCB.IsChecked.GetValueOrDefault();
             Settings.Default.downloadonly = downloadonlyCB.IsChecked.GetValueOrDefault();
-
 
             if (string.IsNullOrEmpty(Settings.Default.deviceid))
                 Settings.Default.deviceid = Guid.NewGuid().ToString();
@@ -111,7 +111,7 @@ namespace MinEBoks
                 return;
             }
 
-            Eboks eBoks = new Eboks();
+            var eBoks = new Eboks();
             if (!eBoks.GetSessionForAccountRest())
                 return;
 
@@ -121,10 +121,9 @@ namespace MinEBoks
             Close();
         }
 
-       
+
         private bool SendTestMail()
         {
-
             if (Settings.Default.downloadonly)
                 return true;
 
@@ -144,7 +143,7 @@ namespace MinEBoks
                 Credentials =
                     new NetworkCredential(Settings.Default.mailserveruser,
                         Settings.Default.mailserverpassword),
-                EnableSsl = Settings.Default.mailserverssl,
+                EnableSsl = Settings.Default.mailserverssl
             };
 
             try
@@ -153,31 +152,17 @@ namespace MinEBoks
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Problemer med at sende post "+ex.Message, "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Problemer med at sende post " + ex.Message, "Fejl", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 return false;
             }
 
             return true;
         }
-        private class OldWindow : System.Windows.Forms.IWin32Window
-        {
-            IntPtr _handle;
-            public OldWindow(IntPtr handle)
-            {
-                _handle = handle;
-            }
-
-            #region IWin32Window Members    
-            IntPtr System.Windows.Forms.IWin32Window.Handle
-            {
-                get { return _handle; }
-            }
-            #endregion
-        }
 
         private void SavePathTB_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var dlg = new System.Windows.Forms.FolderBrowserDialog
+            var dlg = new FolderBrowserDialog
             {
                 SelectedPath = SavePathTB.Text
             };
@@ -185,9 +170,27 @@ namespace MinEBoks
             var win = new OldWindow(source.Handle);
             var result = dlg.ShowDialog(win);
 
-            if (result==System.Windows.Forms.DialogResult.OK)
-            SavePathTB.Text = dlg.SelectedPath;
+            if (result == System.Windows.Forms.DialogResult.OK)
+                SavePathTB.Text = dlg.SelectedPath;
+        }
 
+        private class OldWindow : IWin32Window
+        {
+            private readonly IntPtr _handle;
+
+            public OldWindow(IntPtr handle)
+            {
+                _handle = handle;
+            }
+
+            #region IWin32Window Members    
+
+            IntPtr IWin32Window.Handle
+            {
+                get { return _handle; }
+            }
+
+            #endregion
         }
     }
 }

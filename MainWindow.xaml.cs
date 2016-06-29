@@ -6,11 +6,11 @@ using MinEBoks.Properties;
 namespace MinEBoks
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow
     {
-        readonly Eboks _eboks = new Eboks();
+        private readonly Eboks _eboks = new Eboks();
 
         public MainWindow()
         {
@@ -22,13 +22,11 @@ namespace MinEBoks
                 konfig.ShowDialog();
                 if (!konfig.Konfigok)
                     Close();
-
             }
         }
 
         private async void HentMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-
             var progress =
                 new Progress<string>(
                     s => listView.Items.Add(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "  " + s));
@@ -42,7 +40,6 @@ namespace MinEBoks
 
             if (!konfig.Konfigok)
                 Close();
-
         }
     }
 }

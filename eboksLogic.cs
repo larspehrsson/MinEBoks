@@ -6,6 +6,7 @@ using System.Net.Mail;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web.Security;
 using System.Windows;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -33,6 +34,8 @@ namespace MinEBoks
         private const string BaseUrl = "https://rest.e-boks.dk/mobile/1/xml.svc/en-gb";
 
         private static readonly Session Session = new Session();
+
+        private static readonly string purpose = "NwA3ADUAMQ!AxASDkAMbwAzADcA0";
         //private List<string> _hentet = new List<string>();
 
         public void DownloadFromEBoks(IProgress<string> progress)
@@ -72,10 +75,10 @@ namespace MinEBoks
                       "<Logon xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:eboks:mobile:1.0.0\">" +
                       "<App version=\"1.4.1\" os=\"iOS\" osVersion=\"9.0.0\" Device=\"iPhone\" />" +
                       "<User " +
-                      "identity=\"" + Settings.Default.brugernavn + "\" " +
+                      "identity=\"" + Unprotect(Settings.Default.brugernavn) + "\" " +
                       "identityType=\"P\" " +
                       "nationality=\"DK\" " +
-                      "pincode=\"" + Settings.Default.password + "\"" +
+                      "pincode=\"" + Unprotect(Settings.Default.password) + "\"" +
                       "/>" +
                       "</Logon>";
 
@@ -237,7 +240,8 @@ namespace MinEBoks
             return filename;
         }
 
-        private void MailContent(string url, string filename, string extension, string afsender, string subject, DateTime modtagetdato, IProgress<string> progress)
+        private void MailContent(string url, string filename, string extension, string afsender, string subject,
+            DateTime modtagetdato, IProgress<string> progress)
         {
             filename = GetContent(url, filename, extension, modtagetdato);
             if (filename == null)
@@ -288,7 +292,7 @@ namespace MinEBoks
             var date = DateTime.Now.ToString("yyyy-mm-dd HH:mm:ss");
 
             string input =
-                $"{Settings.Default.aktiveringskode}:{session.DeviceId}:P:{Settings.Default.brugernavn}:DK:{Settings.Default.password}:{date}";
+                $"{Unprotect(Settings.Default.aktiveringskode)}:{session.DeviceId}:P:{Unprotect(Settings.Default.brugernavn)}:DK:{Unprotect(Settings.Default.password)}:{date}";
 
             var challenge = Sha256Hash(input);
             challenge = Sha256Hash(challenge);
@@ -313,6 +317,34 @@ namespace MinEBoks
                     sb.Append(b.ToString("x2"));
             }
             return sb.ToString();
+        }
+
+        public static string Protect(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            var myUnprotectedBytes = Encoding.UTF8.GetBytes(text);
+            var encodedValue = MachineKey.Protect(myUnprotectedBytes, purpose);
+
+            return Convert.ToBase64String(encodedValue);
+        }
+
+        public static string Unprotect(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            try
+            {
+                var stream = Convert.FromBase64String(text);
+                var decodedValue = MachineKey.Unprotect(stream, purpose);
+                return Encoding.UTF8.GetString(decodedValue);
+            }
+            catch (Exception)
+            {
+                return text;
+            }
         }
     }
 }
