@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using MinEBoks.Properties;
 
 namespace MinEBoks
@@ -16,9 +15,6 @@ namespace MinEBoks
         public MainWindow()
         {
             InitializeComponent();
-
-            //Uri iconUri = new Uri(@"eboksdownloader.ico", UriKind.RelativeOrAbsolute);
-            //(this.Parent as Window).Icon = BitmapFrame.Create(iconUri);
 
             if (Settings.Default.response == "" || Settings.Default.brugernavn == "")
             {

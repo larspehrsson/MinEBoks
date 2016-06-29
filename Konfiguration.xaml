@@ -33,8 +33,8 @@
             <Label x:Name="head2" Content="Opsætning:"  HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="10" Height="30" FontSize="14" FontWeight="Bold" RenderTransformOrigin="0.57,11.083"/>
             <Label x:Name="maillabel" Content="Mailserver:" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Row="3" Height="30" FontSize="14" FontWeight="Bold"/>
 
-            <Label x:Name="labela" Content="Brugernavn" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="0" />
-            <Label x:Name="label1" Content="Password" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="1" />
+            <Label x:Name="labela" Content="Cpr-nr." HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="0" />
+            <Label x:Name="label1" Content="Adgangskode" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="1" />
             <Label x:Name="label2" Content="Aktiveringskode" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="2" Grid.ColumnSpan="2"/>
             <Label x:Name="labelx" Content="Gem-sti" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="10" Height="26" />
             <Label x:Name="labely" Content="Download kun" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="11" Height="26" />

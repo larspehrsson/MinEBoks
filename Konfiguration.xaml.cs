@@ -85,8 +85,8 @@ namespace MinEBoks
                 return;
             }
 
-            Settings.Default.password = PasswordTB.Text;
-            Settings.Default.aktiveringskode = AktiveringTB.Text;
+            Settings.Default.password = PasswordTB.Text.Trim();
+            Settings.Default.aktiveringskode = AktiveringTB.Text.Trim();
             Settings.Default.savepath = SavePathTB.Text+(SavePathTB.Text.EndsWith("\\")?"":"\\");
             Settings.Default.mailserver = MailDNSTB.Text;
             Settings.Default.mailserverport = int.Parse(MailPortTB.Text);
@@ -94,7 +94,7 @@ namespace MinEBoks
             Settings.Default.mailserverpassword = MailPasswdTB.Text;
             Settings.Default.mailfrom = MailFromTB.Text;
             Settings.Default.mailto = MailToTB.Text;
-            Settings.Default.brugernavn = BrugernavnTB.Text;
+            Settings.Default.brugernavn = String.Join("", BrugernavnTB.Text.Where(char.IsDigit)).PadLeft(10,'0');
             Settings.Default.mailserverssl = MailSSLCB.IsChecked.GetValueOrDefault();
             Settings.Default.downloadonly = downloadonlyCB.IsChecked.GetValueOrDefault();
 

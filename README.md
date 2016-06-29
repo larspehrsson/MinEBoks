@@ -3,6 +3,10 @@ Program til automatisk at hente dokumenter fra eBoks og gemme dem i en mappe og 
 
 Programmet skal konfigureres ved første start.
 
+Login til EBoks finder du ved at logge ind på eboks og gå til [Menu -> Mobiladgang](https://www.e-boks.dk/privat/#/settings/mobileaccess)
+
+Ønsker man at downloaded alle dokumenter til en mappe (fx sin dropbox) skal man udfylde Cpr-nr, Adgangskode og Aktiveringskode. Disse tre oplysninger finder man på ovenstående side. Hvis man også ønsker at få nye dokumenter tilsendt som post skal man fjerne krydset i "Download kun" og udfylde Mailserver opsætningen. 
+
 Windows installationsprogram til denne version [setup.exe](https://dl.dropboxusercontent.com/u/10635853/EBoks/setup.exe)
 
 ## Related projects
