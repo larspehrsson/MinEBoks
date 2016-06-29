@@ -271,7 +271,7 @@ namespace MinEBoks
             var mailclient = new SmtpClient(Settings.Default.mailserver, Settings.Default.mailserverport)
             {
                 Credentials =
-                    new NetworkCredential(Settings.Default.mailserveruser, Settings.Default.mailserverpassword),
+                    new NetworkCredential(Settings.Default.mailserveruser, Unprotect(Settings.Default.mailserverpassword)),
                 EnableSsl = Settings.Default.mailserverssl
             };
 

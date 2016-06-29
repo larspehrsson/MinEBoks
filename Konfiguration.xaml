@@ -54,7 +54,7 @@
             <TextBox x:Name="MailPortTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="4"/>
             <CheckBox x:Name="MailSSLCB" Grid.Column="2" HorizontalAlignment="Left" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="5"/>
             <TextBox x:Name="MailUserTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="6" ToolTip="Login til mailserver" />
-            <TextBox x:Name="MailPasswdTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="7" ToolTip="Password til mailserver" />
+            <PasswordBox x:Name="MailPasswdTB" Grid.Column="2" Height="26" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="7" ToolTip="Password til mailserver" />
             <TextBox x:Name="MailFromTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="8" ToolTip="Hvem skal mailen være fra" />
             <TextBox x:Name="MailToTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="9" ToolTip="Hvem skal mailen sendes til" />
             <TextBox x:Name="SavePathTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="10" MouseDoubleClick="SavePathTB_OnMouseDoubleClick" ToolTip="Hvor skal hentede dokumenter gemmes" />

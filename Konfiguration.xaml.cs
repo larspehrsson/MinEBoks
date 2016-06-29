@@ -34,7 +34,7 @@ namespace MinEBoks
             MailDNSTB.Text = Settings.Default.mailserver;
             MailPortTB.Text = Settings.Default.mailserverport.ToString();
             MailUserTB.Text = Settings.Default.mailserveruser;
-            MailPasswdTB.Text = Settings.Default.mailserverpassword;
+            MailPasswdTB.Password = Eboks.Unprotect(Settings.Default.mailserverpassword);
             MailFromTB.Text = Settings.Default.mailfrom;
             MailToTB.Text = Settings.Default.mailto;
             MailSSLCB.IsChecked = Settings.Default.mailserverssl;
@@ -93,7 +93,7 @@ namespace MinEBoks
             Settings.Default.mailserver = MailDNSTB.Text;
             Settings.Default.mailserverport = int.Parse(MailPortTB.Text);
             Settings.Default.mailserveruser = MailUserTB.Text;
-            Settings.Default.mailserverpassword = MailPasswdTB.Text;
+            Settings.Default.mailserverpassword = Eboks.Protect(MailPasswdTB.Password);
             Settings.Default.mailfrom = MailFromTB.Text;
             Settings.Default.mailto = MailToTB.Text;
             Settings.Default.mailserverssl = MailSSLCB.IsChecked.GetValueOrDefault();
@@ -142,7 +142,7 @@ namespace MinEBoks
             {
                 Credentials =
                     new NetworkCredential(Settings.Default.mailserveruser,
-                        Settings.Default.mailserverpassword),
+                        Eboks.Unprotect(Settings.Default.mailserverpassword)),
                 EnableSsl = Settings.Default.mailserverssl
             };
 
