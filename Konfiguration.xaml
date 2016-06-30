@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinEBoks"
         mc:Ignorable="d"
-        Title="Konfiguration" Height="577.383" Width="785" Icon="eboksdownloader.ico">
+        Title="Konfiguration" Height="662.883" Width="785" Icon="eboksdownloader.ico">
     <Grid>
         <Grid Margin="10,10,10,0"  >
             <Grid.RowDefinitions>
@@ -21,12 +21,13 @@
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
-                <RowDefinition Height="0"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
                 <RowDefinition Height="80"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="365*"/>
             </Grid.ColumnDefinitions>
 
@@ -39,6 +40,8 @@
             <Label x:Name="label2" Content="Aktiveringskode" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Height="26" Grid.Row="2" Grid.ColumnSpan="2"/>
             <Label x:Name="labelx" Content="Gem-sti" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="10" Height="26" />
             <Label x:Name="labely" Content="Download kun" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="11" Height="26" />
+            <Label x:Name="labelz" Content="Start minimeret" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="12" Height="26" />
+            <Label x:Name="labelauturun" Content="Start med Windows" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="13" Height="26" />
 
             <Label x:Name="dnslabel" Content="DNS" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="3" Height="26" />
             <Label x:Name="portlabel" Content="Port" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" Height="26" />
@@ -60,9 +63,12 @@
             <TextBox x:Name="MailToTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="9" ToolTip="Hvem skal mailen sendes til" />
             <TextBox x:Name="SavePathTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="10" MouseDoubleClick="SavePathTB_OnMouseDoubleClick" ToolTip="Hvor skal hentede dokumenter gemmes" />
             <CheckBox x:Name="downloadonlyCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="11" HorizontalAlignment="Left" Checked="downloadonlyCB_toggled" Unchecked="downloadonlyCB_toggled" ToolTip="Hvis dokumenter kun skal hentes og ikke sendes" />
+            <CheckBox x:Name="StartMinimizedCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="12" HorizontalAlignment="Left" ToolTip="Starter programmet minimeret" />
+            <CheckBox x:Name="auturunCB" IsEnabled="false" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="13" HorizontalAlignment="Left" ToolTip="Starter programmet minimeret" />
 
-            <Button x:Name="NulstilHentedeButton" Content="Nulstil hentede" Grid.Column="2" Height="32" Margin="0,10,163,0" Grid.Row="13" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="NulstilHentedeButton_OnClick" />
-            <Button x:Name="SaveButton" Content="Gem" Grid.Column="2" Height="32" Margin="0,10,10,0" Grid.Row="13" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="SaveButton_Click"/>
+            <Button x:Name="MarkerAltSomHentetButton" Content="Marker alt hentet" Grid.Column="2" Height="32" Margin="0,10,308,0" Grid.Row="14" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" ToolTip="Markerer alle dokumenter i EBoks som hentet uden at hente dem" Click="MarkerAltSomHentetButton_OnClick" />
+            <Button x:Name="NulstilHentedeButton" Content="Nulstil hentede" Grid.Column="2" Height="32" Margin="0,10,163,0" Grid.Row="14" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="NulstilHentedeButton_OnClick" />
+            <Button x:Name="SaveButton" Content="Gem" Grid.Column="2" Height="32" Margin="0,10,10,0" Grid.Row="14" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="SaveButton_Click"/>
         </Grid>
     </Grid>
 </Window>

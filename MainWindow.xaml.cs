@@ -48,6 +48,11 @@ namespace MinEBoks
             KontrolTimer.Tick += TimerHentDokumenter;
             KontrolTimer.Interval = 1000*60*240;
             KontrolTimer.Start();
+            if (Settings.Default.startminimeret)
+            {
+                _notification.Visible = true;
+                Hide();
+            }
 
             HentDokumenter();
         }

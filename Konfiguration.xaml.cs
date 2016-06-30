@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using Microsoft.Win32;
 using MinEBoks.Properties;
 using IWin32Window = System.Windows.Forms.IWin32Window;
 using MessageBox = System.Windows.MessageBox;
@@ -19,12 +20,32 @@ namespace MinEBoks
     /// </summary>
     public partial class Konfiguration
     {
+
+        public static string GetSetting(string setting)
+        {
+            return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\EboksAutoDownloader", setting, "NULL").ToString();
+        }
+
+        // The path to the key where Windows looks for startup applications
+        RegistryKey eboksautodownloaderApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
         private static readonly Random Random = new Random();
         public bool Konfigok;
 
         public Konfiguration()
         {
             InitializeComponent();
+
+            //Microsoft.Win32.RegistryKey exampleregistrykey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader");
+            //var x = exampleregistrykey.GetValue("testsetting");
+            //exampleregistrykey.SetValue("testsetting", "test");
+            //exampleregistrykey.Close();
+			
+			
+			// Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\MyProgram", "Username", "User1");
+			// string username = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\MyProgram", "Username", "NULL").ToString();
+
+            Settings.Default.Upgrade();
 
             PasswordTB.Password = Eboks.Unprotect(Settings.Default.password);
             AktiveringTB.Password = Eboks.Unprotect(Settings.Default.aktiveringskode);
@@ -39,6 +60,8 @@ namespace MinEBoks
             MailToTB.Text = Settings.Default.mailto;
             MailSSLCB.IsChecked = Settings.Default.mailserverssl;
             downloadonlyCB.IsChecked = Settings.Default.downloadonly;
+            StartMinimizedCB.IsChecked = Settings.Default.startminimeret;
+            auturunCB.IsChecked = Settings.Default.autorun;
 
             if (string.IsNullOrEmpty(Settings.Default.deviceid) || string.IsNullOrEmpty(Settings.Default.brugernavn))
                 downloadonlyCB.IsChecked = true;
@@ -67,10 +90,10 @@ namespace MinEBoks
 
         private static string GetRandomHexNumber(int digits)
         {
-            var buffer = new byte[digits/2];
+            var buffer = new byte[digits / 2];
             Random.NextBytes(buffer);
             var result = string.Concat(buffer.Select(x => x.ToString("X2")).ToArray());
-            if (digits%2 == 0)
+            if (digits % 2 == 0)
                 return result.ToLower();
             return (result + Random.Next(16).ToString("x")).ToLower();
         }
@@ -98,6 +121,8 @@ namespace MinEBoks
             Settings.Default.mailto = MailToTB.Text;
             Settings.Default.mailserverssl = MailSSLCB.IsChecked.GetValueOrDefault();
             Settings.Default.downloadonly = downloadonlyCB.IsChecked.GetValueOrDefault();
+            Settings.Default.startminimeret = StartMinimizedCB.IsChecked.GetValueOrDefault();
+            Settings.Default.autorun = auturunCB.IsChecked.GetValueOrDefault();
 
             if (string.IsNullOrEmpty(Settings.Default.deviceid))
                 Settings.Default.deviceid = Guid.NewGuid().ToString();
@@ -114,6 +139,17 @@ namespace MinEBoks
             var eBoks = new Eboks();
             if (!eBoks.GetSessionForAccountRest())
                 return;
+
+            if (Settings.Default.autorun)
+            {
+                // Add the value in the registry so that the application runs at startup
+                eboksautodownloaderApp.SetValue("eboksautodownloader", System.Reflection.Assembly.GetExecutingAssembly().Location);
+            }
+            else
+            {
+                // Remove the value from the registry so that the application doesn't start
+                eboksautodownloaderApp.DeleteValue("eboksautodownloader", false);
+            }
 
             Settings.Default.Save();
 
@@ -202,6 +238,19 @@ namespace MinEBoks
             }
 
             #endregion
+        }
+
+
+        private void MarkerAltSomHentetButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+            var eboks = new Eboks();
+            var notification = new NotifyIcon();
+            Settings.Default.opbyghentet = true;
+            var progress = new Progress<string>(s => Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "  " + s));
+            eboks.DownloadFromEBoks(progress, notification);
+            Settings.Default.opbyghentet = false;
+            Mouse.OverrideCursor = null;
         }
     }
 }
