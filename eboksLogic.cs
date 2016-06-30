@@ -7,38 +7,22 @@ using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Web.Security;
 using System.Windows;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using MinEBoks.Properties;
 using RestSharp;
 using DataFormat = RestSharp.DataFormat;
 using MessageBox = System.Windows.MessageBox;
 
 namespace MinEBoks
 {
-    internal class Session
-    {
-        public string Name { get; set; }
-
-        public string InternalUserId { get; set; }
-
-        public string DeviceId { get; set; }
-
-        public string SessionId { get; set; }
-
-        public string Nonce { get; set; }
-    }
-
     public class Eboks
     {
         private const string BaseUrl = "https://rest.e-boks.dk/mobile/1/xml.svc/en-gb";
 
         private static readonly Session Session = new Session();
 
-        private static readonly string keyphrase = "NwA3ADUAMQ!AxASDkAMbwAzADcA0";
 
         private readonly object runningLock = new object();
 
@@ -53,10 +37,10 @@ namespace MinEBoks
                     DownloadAll(progress, _notification);
                     progress.Report("Kontrol slut");
 
-                    if (Settings.Default.opbyghentet)
+                    if (settings.opbyghentet)
                     {
-                        Settings.Default.opbyghentet = false;
-                        Settings.Default.Save();
+                        settings.opbyghentet = false;
+                        settings.Save();
                     }
                 }
                 finally
@@ -79,7 +63,7 @@ namespace MinEBoks
                 RequestFormat = DataFormat.Xml
             };
 
-            Session.DeviceId = Settings.Default.deviceid;
+            Session.DeviceId = settings.deviceid;
 
             request.AddHeader("X-EBOKS-AUTHENTICATE", GetAuthHeader(Session));
             request.AddHeader("Content-Type", "application/xml");
@@ -89,10 +73,10 @@ namespace MinEBoks
                       "<Logon xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:eboks:mobile:1.0.0\">" +
                       "<App version=\"1.4.1\" os=\"iOS\" osVersion=\"9.0.0\" Device=\"iPhone\" />" +
                       "<User " +
-                      "identity=\"" + Unprotect(Settings.Default.brugernavn) + "\" " +
+                      "identity=\"" + settings.brugernavn + "\" " +
                       "identityType=\"P\" " +
                       "nationality=\"DK\" " +
-                      "pincode=\"" + Unprotect(Settings.Default.password) + "\"" +
+                      "pincode=\"" + settings.password + "\"" +
                       "/>" +
                       "</Logon>";
 
@@ -133,7 +117,6 @@ namespace MinEBoks
 
         private void DownloadAll(IProgress<string> progress, NotifyIcon _notification)
         {
-
             // Henter liste over foldere
             var xdoc = GetXML(Session.InternalUserId + "/0/mail/folders");
             var queryFolders =
@@ -157,15 +140,15 @@ namespace MinEBoks
                     var messageId = message.Attribute("id").Value;
 
                     // Kontroller hvis allerede hentet
-                    if (Settings.Default.idhentet.Contains(messageId)) continue;
-
+                    if (settings.IsHentet(messageId)) continue;
+                    
                     var messageName = message.Attribute("name").Value;
                     var format = message.Attribute("format").Value;
                     var afsender = message.Value;
                     var subject = message.Attribute("name").Value;
                     var modtaget = DateTime.Parse(message.Attribute("receivedDateTime").Value);
 
-                    if (Settings.Default.opbyghentet)
+                    if (settings.opbyghentet)
                     {
                         progress.Report("Markeres som hentet " + afsender + " vedr. " + subject);
                     }
@@ -184,8 +167,7 @@ namespace MinEBoks
                             modtaget, progress);
                     }
 
-                    Settings.Default.idhentet.Add(messageId);
-                    Settings.Default.Save();
+                    settings.AddHentet(messageId, afsender.Trim() + " - " + messageName.Trim());
                 }
             }
         }
@@ -223,7 +205,7 @@ namespace MinEBoks
             extension = extension.ToLower();
 
             filename = Path.GetInvalidFileNameChars().Aggregate(filename, (current, c) => current.Replace(c, '_'));
-            filename = Settings.Default.savepath + filename;
+            filename = settings.savepath + filename;
 
             if (File.Exists(filename + "." + extension))
             {
@@ -265,17 +247,17 @@ namespace MinEBoks
             if (filename == null)
                 return;
 
-            if (Settings.Default.downloadonly)
+            if (settings.downloadonly)
                 return;
 
             // Create a message and set up the recipients.
             var message = new MailMessage(
-                Settings.Default.mailfrom,
-                Settings.Default.mailto,
+                settings.mailfrom,
+                settings.mailto,
                 subject,
                 "")
             {
-                From = new MailAddress(Settings.Default.mailfrom, afsender)
+                From = new MailAddress(settings.mailfrom, afsender)
             };
 
 
@@ -286,12 +268,11 @@ namespace MinEBoks
             message.Attachments.Add(data);
 
             //Send the message.
-            var mailclient = new SmtpClient(Settings.Default.mailserver, Settings.Default.mailserverport)
+            var mailclient = new SmtpClient(settings.mailserver, settings.mailserverport)
             {
                 Credentials =
-                    new NetworkCredential(Settings.Default.mailserveruser,
-                        Unprotect(Settings.Default.mailserverpassword)),
-                EnableSsl = Settings.Default.mailserverssl
+                    new NetworkCredential(settings.mailserveruser, settings.mailserverpassword),
+                EnableSsl = settings.mailserverssl
             };
 
             try
@@ -311,7 +292,7 @@ namespace MinEBoks
             var date = DateTime.Now.ToString("yyyy-mm-dd HH:mm:ss");
 
             string input =
-                $"{Unprotect(Settings.Default.aktiveringskode)}:{session.DeviceId}:P:{Unprotect(Settings.Default.brugernavn)}:DK:{Unprotect(Settings.Default.password)}:{date}";
+                $"{settings.aktiveringskode}:{session.DeviceId}:P:{settings.brugernavn}:DK:{settings.password}:{date}";
 
             var challenge = Sha256Hash(input);
             challenge = Sha256Hash(challenge);
@@ -322,7 +303,7 @@ namespace MinEBoks
         private string GetSessionHeader()
         {
             return
-                $"deviceid={Session.DeviceId},nonce={Session.Nonce},sessionid={Session.SessionId},response={Settings.Default.response}";
+                $"deviceid={Session.DeviceId},nonce={Session.Nonce},sessionid={Session.SessionId},response={settings.response}";
         }
 
         private string Sha256Hash(string value)
@@ -336,34 +317,6 @@ namespace MinEBoks
                     sb.Append(b.ToString("x2"));
             }
             return sb.ToString();
-        }
-
-        public static string Protect(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return null;
-
-            var myUnprotectedBytes = Encoding.UTF8.GetBytes(text);
-            var encodedValue = MachineKey.Protect(myUnprotectedBytes, keyphrase);
-
-            return Convert.ToBase64String(encodedValue);
-        }
-
-        public static string Unprotect(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return null;
-
-            try
-            {
-                var stream = Convert.FromBase64String(text);
-                var decodedValue = MachineKey.Unprotect(stream, keyphrase);
-                return Encoding.UTF8.GetString(decodedValue);
-            }
-            catch (Exception)
-            {
-                return text;
-            }
         }
     }
 }

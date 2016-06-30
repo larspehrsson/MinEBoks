@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using MinEBoks.Properties;
 
 namespace MinEBoks
 {
@@ -15,19 +14,15 @@ namespace MinEBoks
     {
         private static readonly Timer KontrolTimer = new Timer();
         private readonly Eboks _eboks = new Eboks();
-
         private readonly NotifyIcon _notification = new NotifyIcon();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            if (Settings.Default.response == "" || Settings.Default.brugernavn == "")
+            if (string.IsNullOrEmpty(settings.response) || string.IsNullOrEmpty(settings.brugernavn)  || !_eboks.GetSessionForAccountRest())
             {
-                var konfig = new Konfiguration();
-                konfig.ShowDialog();
-                if (!konfig.Konfigok)
-                    Close();
+                RunKonfiguration();
             }
 
             // Minimize to systemtray
@@ -40,15 +35,11 @@ namespace MinEBoks
                     WindowState = WindowState.Normal;
                 };
 
-
-            // Debug til at markere alle dokumenter som hentet uden at hente dem
-            //Settings.Default.opbyghentet = true;
-
             // Kontroller hver 4. time
             KontrolTimer.Tick += TimerHentDokumenter;
-            KontrolTimer.Interval = 1000*60*240;
+            KontrolTimer.Interval = 1000 * 60 * 240;
             KontrolTimer.Start();
-            if (Settings.Default.startminimeret)
+            if (settings.startminimeret)
             {
                 _notification.Visible = true;
                 Hide();
@@ -101,18 +92,21 @@ namespace MinEBoks
         private void MenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             KontrolTimer.Stop();
-            var konfig = new Konfiguration();
-            konfig.ShowDialog();
-
-            if (!konfig.Konfigok)
-                Close();
-
+            RunKonfiguration();
             KontrolTimer.Start();
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             _notification.Visible = false;
+        }
+
+        private void RunKonfiguration()
+        {
+            var konfig = new Konfiguration();
+            konfig.ShowDialog();
+            if (!konfig.Konfigok)
+                Close();
         }
     }
 }

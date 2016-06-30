@@ -51,20 +51,20 @@
             <Label x:Name="fromlabel" Content="Mail from" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="8" Height="26" />
             <Label x:Name="mailtolabel" Content="Mail to" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Grid.Column="1" Grid.Row="9" Height="26" />
 
-            <PasswordBox x:Name="BrugernavnTB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="0" ToolTip="Cprnummer uden -" />
-            <PasswordBox x:Name="PasswordTB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="1" ToolTip="Password til EBoks" />
-            <PasswordBox x:Name="AktiveringTB" Grid.Column="2" Height="26" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="2" ToolTip="Aktiveringskode til EBoks"/>
+            <TextBox x:Name="BrugernavnTB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="0" ToolTip="Cprnummer uden -" />
+            <TextBox x:Name="PasswordTB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="1" ToolTip="Password til EBoks" />
+            <TextBox x:Name="AktiveringTB" Grid.Column="2" Height="26" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="2" ToolTip="Aktiveringskode til EBoks"/>
             <TextBox x:Name="MailDNSTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="3"/>
             <TextBox x:Name="MailPortTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="4"/>
             <CheckBox x:Name="MailSSLCB" Grid.Column="2" HorizontalAlignment="Left" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="5"/>
             <TextBox x:Name="MailUserTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="6" ToolTip="Login til mailserver" />
-            <PasswordBox x:Name="MailPasswdTB" Grid.Column="2" Height="26" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="7" ToolTip="Password til mailserver" />
+            <TextBox x:Name="MailPasswdTB" Grid.Column="2" Height="26" Margin="0,0,0,0" VerticalAlignment="Top" Grid.Row="7" ToolTip="Password til mailserver" />
             <TextBox x:Name="MailFromTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="8" ToolTip="Hvem skal mailen være fra" />
             <TextBox x:Name="MailToTB" Grid.Column="2" Height="26" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="9" ToolTip="Hvem skal mailen sendes til" />
             <TextBox x:Name="SavePathTB" Grid.Column="2" Height="26" Margin="0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Grid.Row="10" MouseDoubleClick="SavePathTB_OnMouseDoubleClick" ToolTip="Hvor skal hentede dokumenter gemmes" />
             <CheckBox x:Name="downloadonlyCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="11" HorizontalAlignment="Left" Checked="downloadonlyCB_toggled" Unchecked="downloadonlyCB_toggled" ToolTip="Hvis dokumenter kun skal hentes og ikke sendes" />
             <CheckBox x:Name="StartMinimizedCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="12" HorizontalAlignment="Left" ToolTip="Starter programmet minimeret" />
-            <CheckBox x:Name="auturunCB" IsEnabled="false" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="13" HorizontalAlignment="Left" ToolTip="Starter programmet minimeret" />
+            <CheckBox x:Name="auturunCB" Grid.Column="2" Height="26" Margin="0" VerticalAlignment="Top" Grid.Row="13" HorizontalAlignment="Left" ToolTip="Starter programmet minimeret" />
 
             <Button x:Name="MarkerAltSomHentetButton" Content="Marker alt hentet" Grid.Column="2" Height="32" Margin="0,10,308,0" Grid.Row="14" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" ToolTip="Markerer alle dokumenter i EBoks som hentet uden at hente dem" Click="MarkerAltSomHentetButton_OnClick" />
             <Button x:Name="NulstilHentedeButton" Content="Nulstil hentede" Grid.Column="2" Height="32" Margin="0,10,163,0" Grid.Row="14" VerticalAlignment="Top" HorizontalAlignment="Right" Width="127" Click="NulstilHentedeButton_OnClick" />
