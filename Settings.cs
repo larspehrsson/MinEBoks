@@ -99,7 +99,7 @@ namespace MinEBoks
             mailserverpassword = Unprotect(GetSetting<string>("mailserverpassword"));
 
             savepath = GetSetting<string>("savepath");
-            mailserveruser = GetSetting<string>("mailserver");
+            mailserver = GetSetting<string>("mailserver");
             mailserverport = GetSetting<int>("mailserverport");
             mailserveruser = GetSetting<string>("mailserveruser");
             mailfrom = GetSetting<string>("mailfrom");
