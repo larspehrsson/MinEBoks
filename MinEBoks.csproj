@@ -32,7 +32,7 @@
     <SuiteName>EBoks</SuiteName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>61</ApplicationRevision>
+    <ApplicationRevision>74</ApplicationRevision>
     <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -58,10 +58,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>FF8824C8F6BC9D85E1F0D90E1D4D9726D5E8CCD3</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>3ECDBD5991AD538DDDA70CA9098665B7476D9187</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>MinEBoks_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -71,6 +72,15 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>eboksdownloader.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestTimestampUrl>http://time.certum.pl/</ManifestTimestampUrl>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -131,7 +141,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="MinEBoks_TemporaryKey.pfx" />
+    <None Include="certifikater\kodesignering.pfx" />
+    <None Include="certifikater\kodesigneringunprotected.pfx" />
     <None Include="packages.config" />
     <AppDesigner Include="Properties\" />
     <None Include="README.md" />
@@ -167,4 +178,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <!-- <Target Name="AfterCompile">
+		<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe&quot; sign /f &quot;$(ProjectDir)\certifikater\kodesigneringunprotected.pfx&quot; /v &quot;$(ProjectDir)obj\x86\$(ConfigurationName)\$(TargetFileName)&quot;" />
+	</Target> -->
+  <Target Name="AfterCompile">
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\x86\signtool.exe&quot; sign /f &quot;$(ProjectDir)\certifikater\kodesigneringunprotected.pfx&quot; /v &quot;$(ProjectDir)obj\$(ConfigurationName)\$(TargetFileName)&quot;" />
+  </Target>
 </Project>

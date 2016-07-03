@@ -120,6 +120,12 @@ namespace MinEBoks
 
         public static void Save()
         {
+            if (string.IsNullOrEmpty(response))
+                response = GetRandomHexNumber(64);
+
+            if (string.IsNullOrEmpty(deviceid))
+                deviceid = Guid.NewGuid().ToString();
+
             SetSetting("brugernavn", Protect(string.Join("", brugernavn.Where(char.IsDigit)).PadLeft(10, '0')));
             SetSetting("password", Protect(password.Trim()));
             SetSetting("aktiveringskode", Protect(aktiveringskode.Trim()));
@@ -135,12 +141,7 @@ namespace MinEBoks
             SetSetting("startminimeret", startminimeret);
             SetSetting("autorun", autorun);
             SetSetting("response", response);
-
-            if (string.IsNullOrEmpty(deviceid))
-                SetSetting("deviceid", Guid.NewGuid().ToString());
-
-            if (string.IsNullOrEmpty(response))
-                SetSetting("response", GetRandomHexNumber(64));
+            SetSetting("deviceid", deviceid);
 
             if (autorun)
             {
