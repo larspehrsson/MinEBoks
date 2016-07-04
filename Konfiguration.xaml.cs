@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
@@ -67,11 +66,18 @@ namespace MinEBoks
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            if (GemSettings())
+                Close();
+
+        }
+
+        private bool GemSettings()
+        {
             if (!Directory.Exists(SavePathTB.Text))
             {
                 MessageBox.Show("Katalog findes ikke: " + SavePathTB.Text, "Fejl", MessageBoxButton.OK,
                     MessageBoxImage.Error);
-                return;
+                return false;
             }
 
             settings.brugernavn = BrugernavnTB.Text;
@@ -97,16 +103,17 @@ namespace MinEBoks
 
             if (!SendTestMail())
             {
-                return;
+                return false;
             }
 
             var eBoks = new Eboks();
             if (!eBoks.GetSessionForAccountRest())
-                return;
+                return false;
 
             settings.Save();
             Konfigok = true;
-            Close();
+
+            return true;
         }
 
 
@@ -193,14 +200,19 @@ namespace MinEBoks
 
         private void MarkerAltSomHentetButton_OnClick(object sender, RoutedEventArgs e)
         {
-            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
-            var eboks = new Eboks();
-            var notification = new NotifyIcon();
-            settings.opbyghentet = true;
-            var progress = new Progress<string>(s => Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "  " + s));
-            eboks.DownloadFromEBoks(progress, notification);
-            settings.opbyghentet = false;
-            Mouse.OverrideCursor = null;
+            if (GemSettings())
+            {
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                var eboks = new Eboks();
+                var notification = new NotifyIcon();
+                settings.opbyghentet = true;
+                var progress =
+                    new Progress<string>(
+                        s => Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "  " + s));
+                eboks.DownloadFromEBoks(progress);
+                settings.opbyghentet = false;
+                Mouse.OverrideCursor = null;
+            }
         }
     }
 }

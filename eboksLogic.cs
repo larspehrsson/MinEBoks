@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -26,7 +27,7 @@ namespace MinEBoks
 
         private readonly object runningLock = new object();
 
-        public void DownloadFromEBoks(IProgress<string> progress, NotifyIcon _notification)
+        public void DownloadFromEBoks(IProgress<string> progress)
         {
             if (Monitor.TryEnter(runningLock))
             {
@@ -34,7 +35,7 @@ namespace MinEBoks
                 {
                     progress.Report("Kontrollerer for nye meddelelser");
                     GetSessionForAccountRest();
-                    DownloadAll(progress, _notification);
+                    DownloadAll(progress);
                     progress.Report("Kontrol slut");
 
                     if (settings.opbyghentet)
@@ -86,8 +87,15 @@ namespace MinEBoks
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                MessageBox.Show("Fejl ved kald af EBoks : " + response.Content, "Fejl", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                if (settings.Notification != null)
+                {
+                    settings.Notification.BalloonTipText = "Fejl ved hent: " + response.Content;
+                    settings.Notification.ShowBalloonTip(5);
+                }
+                else
+                {
+                    MessageBox.Show("Fejl ved kald af EBoks : " + response.Content, "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 return false;
             }
 
@@ -115,7 +123,7 @@ namespace MinEBoks
         }
 
 
-        private void DownloadAll(IProgress<string> progress, NotifyIcon _notification)
+        private void DownloadAll(IProgress<string> progress)
         {
             // Henter liste over foldere
             var xdoc = GetXML(Session.InternalUserId + "/0/mail/folders");
@@ -141,7 +149,7 @@ namespace MinEBoks
 
                     // Kontroller hvis allerede hentet
                     if (settings.IsHentet(messageId)) continue;
-                    
+
                     var messageName = message.Attribute("name").Value;
                     var format = message.Attribute("format").Value;
                     var afsender = message.Value;
@@ -156,15 +164,20 @@ namespace MinEBoks
                     {
                         progress.Report("Henter meddelelse fra " + afsender + " vedr. " + subject);
 
-                        _notification.BalloonTipText = "Hentede " + subject + " fra eboks";
-                        _notification.ShowBalloonTip(5);
-
                         // Hent vedhæftninger til besked
                         GetSessionForAccountRest();
-                        MailContent(
+                        var filename = MailContent(
                             Session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
                             "/content", afsender.Trim() + " - " + messageName.Trim(), format, afsender, subject,
                             modtaget, progress);
+
+                        settings.Notification.BalloonTipText = "Hentede " + subject + " fra eboks";
+                        settings.Notification.BalloonTipClicked += (sender, e) =>
+                        {
+                            Process.Start(filename);
+                        };
+                        settings.Notification.ShowBalloonTip(10);
+
                     }
 
                     settings.AddHentet(messageId, afsender.Trim() + " - " + messageName.Trim());
@@ -240,15 +253,15 @@ namespace MinEBoks
             return filename;
         }
 
-        private void MailContent(string url, string filename, string extension, string afsender, string subject,
+        private string MailContent(string url, string filename, string extension, string afsender, string subject,
             DateTime modtagetdato, IProgress<string> progress)
         {
             filename = GetContent(url, filename, extension, modtagetdato);
             if (filename == null)
-                return;
+                return null;
 
             if (settings.downloadonly)
-                return;
+                return filename;
 
             // Create a message and set up the recipients.
             var message = new MailMessage(
@@ -285,6 +298,8 @@ namespace MinEBoks
             }
 
             data.Dispose();
+
+            return filename;
         }
 
         private string GetAuthHeader(Session session)

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Web.Security;
+using System.Windows.Forms;
 using Microsoft.Win32;
 
 namespace MinEBoks
@@ -25,11 +25,9 @@ namespace MinEBoks
     {
         private const string keyphrase = "NwA3ADUAMQ!AxASDkAMbwAzADcA0";
         private static readonly RegistryKey RK = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader");
-
-        private static readonly RegistryKey HentetRK =
-            Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs");
-
+        private static readonly RegistryKey HentetRK = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs");
         private static readonly Random Random = new Random();
+        public static readonly NotifyIcon Notification = new NotifyIcon();
 
         static settings()
         {
@@ -99,7 +97,7 @@ namespace MinEBoks
             mailserverpassword = Unprotect(GetSetting<string>("mailserverpassword"));
 
             savepath = GetSetting<string>("savepath");
-            mailserver = GetSetting<string>("mailserver");
+            mailserver = GetSetting<string>("mailserver") ?? "smtp.gmail.com";
             mailserverport = GetSetting<int>("mailserverport");
             mailserveruser = GetSetting<string>("mailserveruser");
             mailfrom = GetSetting<string>("mailfrom");
@@ -145,16 +143,10 @@ namespace MinEBoks
 
             if (autorun)
             {
-
-                // The path to the key where Windows looks for startup applications
-                //RegistryKey rkApp = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-
                 //Path to launch shortcut
                 string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs) + @"\Lars Pehrsson\EBoks\EBoks autodownloader.appref-ms";
 
                 rkApp.SetValue("eboksdownloader3", startPath);
-                // Add the value in the registry so that the application runs at startup
-                //rkApp.SetValue("eboksdownloader", Assembly.GetExecutingAssembly().Location);
             }
             else
             {
