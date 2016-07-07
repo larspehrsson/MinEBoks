@@ -42,7 +42,7 @@ namespace MinEBoks
             };
             menuItemHent.Click += MenuItemHentClick;
 
-            // Initialize menuItemHent
+            // Initialize menuItemÅbn
             var menuItemÅbn = new MenuItem
             {
                 Index = 1,
@@ -97,6 +97,8 @@ namespace MinEBoks
         private void TimerHentDokumenter(object myObject, EventArgs myEventArgs)
         {
             settings.Notification.Visible = true;
+
+            System.Threading.Thread.Sleep(1000*60*2);  // Vent 2 minutter hvis pc'en lige er vågnet fra standby
 
             HentDokumenter();
 

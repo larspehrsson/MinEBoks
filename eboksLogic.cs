@@ -9,7 +9,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using RestSharp;
@@ -25,16 +24,15 @@ namespace MinEBoks
         private static readonly Session Session = new Session();
 
 
-        private readonly object runningLock = new object();
+        private readonly object _runningLock = new object();
 
         public void DownloadFromEBoks(IProgress<string> progress)
         {
-            if (Monitor.TryEnter(runningLock))
+            if (Monitor.TryEnter(_runningLock))
             {
                 try
                 {
                     progress.Report("Kontrollerer for nye meddelelser");
-                    GetSessionForAccountRest();
                     DownloadAll(progress);
                     progress.Report("Kontrol slut");
 
@@ -46,12 +44,15 @@ namespace MinEBoks
                 }
                 finally
                 {
-                    Monitor.Exit(runningLock);
+                    Monitor.Exit(_runningLock);
                 }
             }
         }
 
-
+        /// <summary>
+        /// Henter sessionid og nonce fra EBoks
+        /// </summary>
+        /// <returns>true hvis sessionid blev hentet</returns>
         public bool GetSessionForAccountRest()
         {
             var client = new RestClient(BaseUrl)
@@ -125,8 +126,15 @@ namespace MinEBoks
 
         private void DownloadAll(IProgress<string> progress)
         {
+
             // Henter liste over foldere
             var xdoc = GetXML(Session.InternalUserId + "/0/mail/folders");
+            if (xdoc == null)
+            {
+                progress.Report("Ingen folderoversigt modtaget fra EBoks");
+                return;
+            }
+
             var queryFolders =
                 (from t in xdoc.Descendants("FolderInfo") where t.Attribute("id") != null select t).ToList();
 
@@ -134,11 +142,14 @@ namespace MinEBoks
             foreach (var folder in queryFolders)
             {
                 var folderid = folder.Attribute("id").Value;
-                //var foldername = folder.Attribute("name").Value;
 
                 // Hent liste over beskeder i hver folder
-                GetSessionForAccountRest();
                 var messages = GetXML(Session.InternalUserId + "/0/mail/folder/" + folderid + "?skip=0&take=100");
+                if (messages == null)
+                {
+                    progress.Report("Ingen beskedoversigt modtaget fra EBoks");
+                    return;
+                }
 
                 // Traverser hver besked og hent vedhæftninger
                 var queryMessages =
@@ -165,13 +176,12 @@ namespace MinEBoks
                         progress.Report("Henter meddelelse fra " + afsender + " vedr. " + subject);
 
                         // Hent vedhæftninger til besked
-                        GetSessionForAccountRest();
                         var filename = MailContent(
                             Session.InternalUserId + "/0/mail/folder/" + folderid + "/message/" + messageId +
                             "/content", afsender.Trim() + " - " + messageName.Trim(), format, afsender, subject,
                             modtaget, progress);
 
-                        settings.Notification.BalloonTipText = "Hentede " + subject + " fra eboks";
+                        settings.Notification.BalloonTipText = "Hentede " + subject;
                         settings.Notification.BalloonTipClicked += (sender, e) =>
                         {
                             Process.Start(filename);
@@ -187,6 +197,10 @@ namespace MinEBoks
 
         private XDocument GetXML(string url)
         {
+            // Hent ny sessionid og nonce
+            if (!GetSessionForAccountRest())
+                return null;
+
             var client = new RestClient(BaseUrl)
             {
                 UserAgent = "eboks/35 CFNetwork/672.1.15 Darwin/14.0.0"
@@ -215,10 +229,13 @@ namespace MinEBoks
 
         private string GetContent(string url, string filename, string extension, DateTime modtagetdato)
         {
+            if (!GetSessionForAccountRest())
+                return null;
+
             extension = extension.ToLower();
 
             filename = Path.GetInvalidFileNameChars().Aggregate(filename, (current, c) => current.Replace(c, '_'));
-            filename = settings.savepath + filename;
+            filename = Path.Combine(settings.savepath, filename);
 
             if (File.Exists(filename + "." + extension))
             {
@@ -258,7 +275,10 @@ namespace MinEBoks
         {
             filename = GetContent(url, filename, extension, modtagetdato);
             if (filename == null)
+            {
+                progress.Report("Ingen fil modtaget fra EBoks");
                 return null;
+            }
 
             if (settings.downloadonly)
                 return filename;
@@ -317,8 +337,7 @@ namespace MinEBoks
 
         private string GetSessionHeader()
         {
-            return
-                $"deviceid={Session.DeviceId},nonce={Session.Nonce},sessionid={Session.SessionId},response={settings.response}";
+            return $"deviceid={Session.DeviceId},nonce={Session.Nonce},sessionid={Session.SessionId},response={settings.response}";
         }
 
         private string Sha256Hash(string value)
