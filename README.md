@@ -11,7 +11,7 @@ Programmet holder styr på hvilke dokumenter der er hentet, så man kan flytte d
 
 Så længe programmet kører vil det polle efter nye dokumenter hver 4. time.
 
-Windows installationsprogram til denne version [setup.exe](https://dl.dropboxusercontent.com/u/10635853/EBoks/setup.exe)
+Windows installationsprogram til denne version [setup.exe](https://raw.githubusercontent.com/larspehrsson/MinEBoks/master/publish/setup.exe)
 
 ## Related projects
 

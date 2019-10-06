@@ -36,7 +36,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>85</ApplicationRevision>
+    <ApplicationRevision>86</ApplicationRevision>
     <ApplicationVersion>1.0.10.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -62,17 +62,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>3ECDBD5991AD538DDDA70CA9098665B7476D9187</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>804A5FEDB2539A333DE48CB16FDD07DE8230844D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>
-    </ManifestKeyFile>
+    <ManifestKeyFile>MinEBoks_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>eboksdownloader.ico</ApplicationIcon>
@@ -152,6 +151,7 @@
     <None Include="certifikater\kodesignering.pfx" />
     <None Include="certifikater\kodesigneringunprotected.pfx" />
     <AppDesigner Include="Properties\" />
+    <None Include="MinEBoks_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
