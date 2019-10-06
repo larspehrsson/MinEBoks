@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web.Security;
@@ -25,9 +27,17 @@ namespace MinEBoks
     {
         private const string keyphrase = "NwA3ADUAMQ!AxASDkAMbwAzADcA0";
         private static readonly RegistryKey RK = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader");
-        private static readonly RegistryKey HentetRK = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs");
+
+        private static readonly RegistryKey HentetRK =
+            Registry.CurrentUser.CreateSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs");
+
         private static readonly Random Random = new Random();
         public static readonly NotifyIcon Notification = new NotifyIcon();
+
+        private static Dictionary<string, string>  HentetIDDictionary = new Dictionary<string, string>();
+
+        private static readonly RegistryKey rkApp =
+            Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
         static settings()
         {
@@ -55,16 +65,61 @@ namespace MinEBoks
         public static void SletHentetList()
         {
             Registry.CurrentUser.DeleteSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs");
+            File.Delete(HentetFilename());
+        }
+
+        private static void MigrateToCommonApplicationData()
+        {
+            var hentid = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs", true);
+            if (hentid == null)
+                return;
+
+            var filename = HentetFilename();
+
+            if (!Directory.Exists(Path.GetDirectoryName(filename)))
+                Directory.CreateDirectory(Path.GetDirectoryName(filename));
+
+            using (var sw = new StreamWriter(filename, true))
+                foreach (var v in hentid.GetValueNames())
+                {
+                    sw.WriteLine(v + "	" + HentetRK.GetValue(v));
+                }
+
+            Registry.CurrentUser.DeleteSubKey(@"SOFTWARE\EboksAutoDownloader\HentetIDs");
+        }
+
+        public static void HentIDList()
+        {
+            if (!File.Exists(HentetFilename()))
+                MigrateToCommonApplicationData();
+
+            var filename = HentetFilename();
+            if (!Directory.Exists(Path.GetDirectoryName(filename)))
+                Directory.CreateDirectory(Path.GetDirectoryName(filename));
+
+
+            if (File.Exists(HentetFilename()))
+            {
+                HentetIDDictionary = File.ReadAllLines(HentetFilename()).ToDictionary(c => c.Split('	')[0], c => c.Split('	')[1]);
+            }
+        }
+
+        private static string HentetFilename()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"EBoksDownloader\hentet.txt");
         }
 
         public static void AddHentet(string id, string value)
         {
-            HentetRK.SetValue(id, value);
+            using (var sw = new StreamWriter(HentetFilename(), true))
+                sw.WriteLine(id + "	" + value);
+
+            HentetIDDictionary.Add(id, value);
         }
 
         public static bool IsHentet(string id)
         {
-            return HentetRK.GetValue(id) != null;
+            return HentetIDDictionary.ContainsKey(id);
         }
 
         private static T GetSetting<T>(string setting)
@@ -79,7 +134,6 @@ namespace MinEBoks
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
-
         private static void SetSetting<T>(string setting, T value)
         {
             if (value == null)
@@ -87,7 +141,6 @@ namespace MinEBoks
             else
                 RK.SetValue(setting, value);
         }
-
 
         public static void Get()
         {
@@ -113,8 +166,6 @@ namespace MinEBoks
                 string.IsNullOrEmpty(GetSetting<string>("brugernavn")))
                 downloadonly = true;
         }
-
-        private static RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
         public static void Save()
         {
@@ -144,7 +195,8 @@ namespace MinEBoks
             if (autorun)
             {
                 //Path to launch shortcut
-                string startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs) + @"\Lars Pehrsson\EBoks\EBoks autodownloader.appref-ms";
+                var startPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs) +
+                                @"\Lars Pehrsson\EBoks\EBoks autodownloader.appref-ms";
 
                 rkApp.SetValue("eboksdownloader3", startPath);
             }

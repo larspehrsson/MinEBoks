@@ -20,6 +20,8 @@ namespace MinEBoks
         {
             InitializeComponent();
 
+            settings.HentIDList();
+
             if (string.IsNullOrEmpty(settings.response) || string.IsNullOrEmpty(settings.brugernavn) ||
                 !_eboks.GetSessionForAccountRest())
             {
@@ -96,9 +98,9 @@ namespace MinEBoks
 
         private void TimerHentDokumenter(object myObject, EventArgs myEventArgs)
         {
-            settings.Notification.Visible = true;
-
             System.Threading.Thread.Sleep(1000*60*2);  // Vent 2 minutter hvis pc'en lige er vågnet fra standby
+        
+            settings.Notification.Visible = true;
 
             HentDokumenter();
 

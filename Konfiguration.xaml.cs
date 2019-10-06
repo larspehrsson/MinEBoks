@@ -108,7 +108,10 @@ namespace MinEBoks
 
             var eBoks = new Eboks();
             if (!eBoks.GetSessionForAccountRest())
+            {
+                MessageBox.Show("Opsætning kunne ikke verificeres.", "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
+            }
 
             settings.Save();
             Konfigok = true;

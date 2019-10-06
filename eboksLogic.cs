@@ -190,7 +190,7 @@ namespace MinEBoks
 
                     }
 
-                    settings.AddHentet(messageId, afsender.Trim() + " - " + messageName.Trim());
+                    settings.AddHentet(messageId, afsender.Trim() + " - " + messageName.Trim() + "." + format);
                 }
             }
         }
@@ -237,19 +237,7 @@ namespace MinEBoks
             filename = Path.GetInvalidFileNameChars().Aggregate(filename, (current, c) => current.Replace(c, '_'));
             filename = Path.Combine(settings.savepath, filename);
 
-            if (File.Exists(filename + "." + extension))
-            {
-                var i = 0;
-                string tmpfilename;
-                do
-                {
-                    i += 1;
-                    tmpfilename = filename + "(" + i + ")." + extension;
-                } while (File.Exists(tmpfilename));
-                filename = tmpfilename;
-            }
-            else
-                filename += "." + extension;
+
 
             var client = new RestClient(BaseUrl)
             {
@@ -261,6 +249,32 @@ namespace MinEBoks
             request.AddHeader("Accept", "*/*");
 
             var filedata = client.DownloadData(request);
+
+            if (File.Exists(filename + "." + extension))
+            {
+                var existingfiledata = File.ReadAllBytes(filename + "." + extension);
+                if (filedata.SequenceEqual(existingfiledata))
+                    return filename + "." + extension;
+
+                var i = 0;
+                string tmpfilename;
+                do
+                {
+                    i += 1;
+                    tmpfilename = filename + "(" + i + ")." + extension;
+                    if (File.Exists(tmpfilename))
+                    {
+                        existingfiledata = File.ReadAllBytes(tmpfilename);
+                        if (filedata.SequenceEqual(existingfiledata))
+                            return tmpfilename;
+                    }
+
+                } while (File.Exists(tmpfilename));
+                filename = tmpfilename;
+            }
+            else
+                filename += "." + extension;
+
             File.WriteAllBytes(filename, filedata);
 
             File.SetCreationTime(filename, modtagetdato);
